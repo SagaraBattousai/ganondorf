@@ -1,9 +1,12 @@
+""" Module for using builtin numeric datasets
+
+"""
+
 import os
 from typing import Tuple, ClassVar
 import attr
 from tensorflow_federated.python.simulation import ClientData
 from . import federated
-from . import medical
 
 __BUILTIN_DATASET_CLIENT_ID_RANGE = \
   {
@@ -13,7 +16,7 @@ __BUILTIN_DATASET_CLIENT_ID_RANGE = \
   }
 
 def load_numeric(dataset_name: str,
-         normalised: bool = True) -> federated.Federated_Loader:
+         normalised: bool = True) -> federated.FederatedLoader:
   """ Loads a builtin numeric (array like) dataset
 
   Parameters
@@ -26,7 +29,7 @@ def load_numeric(dataset_name: str,
 
   Returns
   -------
-  federated.Federated_Loader
+  federated.FederatedLoader
     A Federated Loader that loads the requested dataset
 
   """
@@ -38,7 +41,11 @@ def load_numeric(dataset_name: str,
 
 
 @attr.s(auto_attribs=True, slots=True, frozen=True)
-class _DatasetLoader(federated.Federated_Loader):
+class _DatasetLoader(federated.FederatedLoader):
+  """ Private class handling actual dataset loading
+
+  """
+
   filename: str
   directory: str
   client_id_range: Tuple[int, int]

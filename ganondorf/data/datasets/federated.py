@@ -1,12 +1,12 @@
 """ DOC STRING """
 from abc import ABC, abstractmethod
-from typing import Mapping, ClassVar, Tuple, Iterable
+from typing import Tuple, Iterable #, Mapping
 import attr
 import numpy as np
 from tensorflow_federated.python.simulation import ClientData
 from . import loader
 
-class Federated_Loader(ABC):
+class FederatedLoader(ABC):
   """ Interface for loading a tensorflow federated database.
 
   """
@@ -16,10 +16,16 @@ class Federated_Loader(ABC):
     pass
 
 # class MappingLoader(Loader):
-#   """ Interface 
+#   """ Interface
 
 @attr.s(auto_attribs=True, slots=True, frozen=True)
-class NpzLoader(Federated_Loader):
+class NpzLoader(FederatedLoader):
+  """ Loader for importing Numpy NPZ files (Compressed or not).
+  The names of the included arrays should be the names for the clients
+  used in a federated context with information on whether it is training or
+  testing data although this is flexible
+
+  """
 
   filename: str
   client_ids: Iterable[str]
@@ -37,13 +43,13 @@ class NpzLoader(Federated_Loader):
 
     for client_id in self.client_ids:
       train_data = mapping_dataset[client_id + self.client_train_suffix]
-      
+
       train_dataset[client_id] = \
           loader.ArrayLoader(train_data, self.label_index).load_dataset()
 
       if self.load_test_data:
         test_data = mapping_dataset[client_id + self.client_test_suffix]
-       
+
         test_dataset[client_id] = \
             loader.ArrayLoader(test_data, self.label_index).load_dataset()
 

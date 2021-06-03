@@ -1,11 +1,12 @@
+""" Main Module Doc String
+
+"""
+
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" # pylint: disable=C0413
 
 import datetime
-from typing import Tuple
 import numpy as np
-import SimpleITK as sitk
-import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from ganondorf.data import datasets as gds
@@ -23,7 +24,7 @@ def patch_dataset(pre, post):
 def image_norm(image):
   max_image = np.amax(image, axis=0)
   max_image[max_image == 0] = 1
-  return (image / max_image)
+  return image / max_image
 
 def invert(image):
   image = image * (-1)
@@ -43,12 +44,16 @@ if __name__ == "__main__":
   train_pre  = tf.data.Dataset.from_tensor_slices(
       list(map(image_norm, btl.pre_scans[:10]))
       )
-  # train_post = tf.data.Dataset.from_tensor_slices(list(map(image_norm, btl.post_scans[:10])))
+  # train_post = tf.data.Dataset.from_tensor_slices(
+    # list(map(image_norm, btl.post_scans[:10]))
+    # )
 
   test_pre  = tf.data.Dataset.from_tensor_slices(
       list(map(image_norm, btl.pre_scans[10:]))
       )
-  # test_post = tf.data.Dataset.from_tensor_slices(list(map(image_norm, btl.post_scans[10:])))
+  # test_post = tf.data.Dataset.from_tensor_slices(
+    # list(map(image_norm, btl.post_scans[10:]))
+    # )
 
   ##################################################
   # New Invert of target do make it look diff
@@ -83,13 +88,13 @@ if __name__ == "__main__":
   test_dataset  = test_dataset.shuffle(BUFFER_SIZE)
 
   #Ignore Batching for now due to patch splitting
-  #train_dataset = train_dataset.batch(BATCH_SIZE) 
+  #train_dataset = train_dataset.batch(BATCH_SIZE)
   #test_dataset  = test_dataset.batch(BATCH_SIZE)
 
 
   train_dataset = train_dataset.map(patch_dataset)
   test_dataset  = test_dataset.map(patch_dataset)
-  
+
   ##TODO: split and sew code!
   #>>> ds2 = ds1.map(gds.split_into_patches)
   #>>> ids2 = iter(ds2)
@@ -106,16 +111,12 @@ if __name__ == "__main__":
 
   generator_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001,
                                                  beta_1=0.5)
-  
+
   discriminator_optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001,
                                                      beta_1=0.5)
-  
-<<<<<<< HEAD
+
   checkpoint_dir = dir_path("tensorflow_outputs", "training_checkpoints")
-=======
-  checkpoint_dir = dir_path("training_checkpoints")
->>>>>>> origin/master
-  
+
   checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
   checkpoint = tf.train.Checkpoint(
       generator_optimizer=generator_optimizer,
@@ -124,11 +125,7 @@ if __name__ == "__main__":
       discriminator=discriminator)
 
 
-<<<<<<< HEAD
   log_dir = dir_path("tensorflow_outputs", "logs")
-=======
-  log_dir = dir_path("logs")
->>>>>>> origin/master
 
   summary_writer = tf.summary.create_file_writer(
       os.path.join(log_dir,
@@ -148,8 +145,4 @@ if __name__ == "__main__":
           checkpoint=checkpoint,
           summary_writer=summary_writer,
           checkpoint_prefix=checkpoint_prefix)
-
-
-
-
 

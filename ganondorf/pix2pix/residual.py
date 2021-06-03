@@ -4,29 +4,31 @@
 
 from typing import Tuple, Union, ClassVar
 import functools
-import numpy as np
 import tensorflow as tf
 
 Conv3DSpec = Union[int, Tuple[int, int, int]]
 
 class ResidualBottleneckLayer(tf.keras.Model):
+  """ Class for Residual BottleneckLayer
+
+  """
 
   DOWN_FILTER_SCALE: ClassVar[int] = 4
-  _Name_Acc = 0
+  _NAME_ACC = 0
 
-  def __init__(self, 
+  def __init__(self,
                filters: Conv3DSpec,
                kernel_size: Conv3DSpec = (3, 3, 3),
                strides: Conv3DSpec = (1, 1, 1),
                name: str = None):
 
-    if name == None:
-      ResidualBottleneckLayer._Name_Acc += 1
-      name = f"Residual_Bottleneck_{ResidualBottleneckLayer._Name_Acc}"
+    if name is None:
+      ResidualBottleneckLayer._NAME_ACC += 1
+      name = f"Residual_Bottleneck_{ResidualBottleneckLayer._NAME_ACC}"
 
     super().__init__(name=name)
     self._filter1, self._filter2, self._filter3 = [filters] * 3 \
-        if isinstance(filters, int) else filters 
+        if isinstance(filters, int) else filters
         #TODO set indent if else is below if
 
     self._kernel_size = [kernel_size] * 3 \
@@ -35,7 +37,7 @@ class ResidualBottleneckLayer(tf.keras.Model):
     self._strides = [strides] * 3 \
         if isinstance(strides, int) else strides
 
-    # Feature Down Convolution 
+    # Feature Down Convolution
     self.down_norm = tf.keras.layers.BatchNormalization()
     self.down_act  = tf.keras.layers.ReLU()
     self.down_conv = tf.keras.layers.Conv3D(filters=self._filter1,
@@ -62,7 +64,7 @@ class ResidualBottleneckLayer(tf.keras.Model):
 
   #TODO add insert code for first def after __init__
   def call(self, input_tensor, training=False):
-    """ For the first Residual Unit 
+    """ For the first Residual Unit
     (that follows a stand-alone convolutional layer,
     conv1), we adopt the first activation right after conv1
     and before splitting into two paths; for the last Residual Unit

@@ -1,14 +1,18 @@
+""" Module for loading datasets revolving around medical images especially
+those saved in a medical format such as .nii (NIfTI)
+
+"""
 import os
 import math
 import attr
-from typing import Sequence, Union, List, Tuple, ClassVar, Dict, Any, TypeVar
+from typing import Sequence, Union, List, Tuple, ClassVar, Dict, TypeVar
 import numpy as np
 import SimpleITK as sitk
 import tensorflow as tf
 from .loader import Loader
 
-T = TypeVar('T')
-U = TypeVar('U')
+T = TypeVar("T")
+U = TypeVar("U")
 
 @attr.s(auto_attribs=True, slots=True, frozen=True)
 class NiiLoader(Loader):
@@ -38,7 +42,7 @@ class NiiLoader(Loader):
     else:
       return NiiLoader._stack_multiple_files(self.filenames)
 
-  
+
   @staticmethod
   def _load_multiple_files(fnames: Sequence[str]) -> List[np.array]:
     return [NiiLoader._load_array(fname) \
@@ -92,7 +96,11 @@ def load_medical(dataset_name: str,
 
 @attr.s(auto_attribs=True, slots=True)
 class BrainTumorProgressionLoader(Loader):
-  DATASET_NAME: ClassVar[str] = 'BrainTumorProgression'
+  """ Dataset Loader for builtin BrainProgressionTumor Dataset
+
+  """
+
+  DATASET_NAME: ClassVar[str] = "BrainTumorProgression"
   IMAGE_TYPES: ClassVar[int] = 4 # Pre and Post Scans and Pre and Post Masks
   CLIENT_COUNT: ClassVar[int] = 11
 
@@ -101,10 +109,10 @@ class BrainTumorProgressionLoader(Loader):
        for i in range(1, CLIENT_COUNT + 1)] * IMAGE_TYPES
       )
 
-  IMAGE_NAMES: ClassVar[str] = ['Pre_Scan_T1.nii.gz',
-                                'Pre_Mask.nii.gz',
-                                'Post_Scan_T1.nii.gz',
-                                'Post_Mask.nii.gz'] * CLIENT_COUNT
+  IMAGE_NAMES: ClassVar[str] = ["Pre_Scan_T1.nii.gz",
+                                "Pre_Mask.nii.gz",
+                                "Post_Scan_T1.nii.gz",
+                                "Post_Mask.nii.gz"] * CLIENT_COUNT
 
   image_paths = [os.path.join(val[0], val[1]) \
                  for val in zip(CLIENT_NAMES, IMAGE_NAMES)]
@@ -126,91 +134,86 @@ class BrainTumorProgressionLoader(Loader):
 
   @property
   def pre_scans(self) -> np.array:
-    if self._pre_scans == None:
+    if self._pre_scans is None:
       self._pre_scans = load_medical(self.DATASET_NAME,
-                                     image_paths[0::4]).load_images()
+                                     self.image_paths[0::4]).load_images()
     return self._pre_scans
 
   @property
   def pre_masks(self) -> np.array:
-    if self._pre_masks == None:
+    if self._pre_masks is None:
       self._pre_masks = load_medical(self.DATASET_NAME,
-                               image_paths[1::4]).load_images()
+                               self.image_paths[1::4]).load_images()
     return self._pre_masks
 
   @property
   def post_scans(self) -> np.array:
-    if self._post_scans == None:
+    if self._post_scans is None:
       self._post_scans = load_medical(self.DATASET_NAME,
-                                      image_paths[2::4]).load_images()
+                                      self.image_paths[2::4]).load_images()
     return self._post_scans
 
   @property
   def post_masks(self) -> np.array:
-    if self._post_masks == None:
-      self._post_masks = load_medical(self.DATASET_NAME, 
-                                      image_paths[3::4]).load_images()
+    if self._post_masks is None:
+      self._post_masks = load_medical(self.DATASET_NAME,
+                                      self.image_paths[3::4]).load_images()
     return self._post_masks
 
 
   def load_dataset(self) -> tf.data.Dataset:
     return tf.data.Dataset.from_tensor_slices(self.dataset_dictionary)
 
-  """
-  @staticmethod
-  def _pairs(index: int, 
-             fst: Sequence[T], 
-             snd: Sequence[U]) -> Tuple[T, U]:
-    return (fst[index], snd[index])
+  # @staticmethod
+  # def _pairs(index: int,
+  #            fst: Sequence[T],
+  #            snd: Sequence[U]) -> Tuple[T, U]:
+  #   return (fst[index], snd[index])
 
-  def progression_pairs(self, scan_number: int) -> Tuple[np.array, np.array]:
-    return BrainTumorProgressionLoader._pairs(
-        scan_number, self.pre_scans, self.post_scans)
+  # def progression_pairs(self, scan_number: int) -> Tuple[np.array, np.array]:
+  #   return BrainTumorProgressionLoader._pairs(
+  #       scan_number, self.pre_scans, self.post_scans)
 
-  def pre_segmentation_pairs(self,
-                             segmentation_number: int
-                             ) -> Tuple[np.array, np.array]:
-    return BrainTumorProgressionLoader._pairs(
-        scan_number, self.pre_scans, self.pre_masks)
+  # def pre_segmentation_pairs(self,
+  #                            segmentation_number: int
+  #                            ) -> Tuple[np.array, np.array]:
+  #   return BrainTumorProgressionLoader._pairs(
+  #       scan_number, self.pre_scans, self.pre_masks)
 
-  def post_segmentation_pairs(self,
-                              segmentation_number: int
-                              ) -> Tuple[np.array, np.array]:
-    return BrainTumorProgressionLoader._pairs(
-        scan_number, self.post_scans, self.post_masks)
-
-
-  def progression_dataset(self,
-                          scan_range: Tuple[int, int]
-                          ) -> tf.data.Dataset:
-    dataset = tf.data.Dataset.from_tensor_slices(list(range(*scan_range)))
-    dataset = dataset.map(self.progression_pairs)
-
-    return dataset
-
-  def pre_segmentation_dataset(self,
-                               segmentation_range: Tuple[int, int]
-                               ) -> tf.data.Dataset:
-    dataset = tf.data.Dataset.from_tensor_slices(
-        list(range(*segmentation_range))
-        )
-    dataset = dataset.map(self.pre_segmentation_pairs)
-
-    return dataset
-
-  def post_segmentation_dataset(self,
-                                segmentation_range: Tuple[int, int]
-                                ) -> tf.data.Dataset:
-    dataset = tf.data.Dataset.from_tensor_slices(
-        list(range(*segmentation_range))
-        )
-    dataset = dataset.map(self.post_segmentation_pairs)
-
-    return dataset
-  """
+  # def post_segmentation_pairs(self,
+  #                             segmentation_number: int
+  #                             ) -> Tuple[np.array, np.array]:
+  #   return BrainTumorProgressionLoader._pairs(
+  #       scan_number, self.post_scans, self.post_masks)
 
 
+  # def progression_dataset(self,
+  #                         scan_range: Tuple[int, int]
+  #                         ) -> tf.data.Dataset:
+  #   dataset = tf.data.Dataset.from_tensor_slices(list(range(*scan_range)))
+  #   dataset = dataset.map(self.progression_pairs)
 
+  #   return dataset
+
+  # def pre_segmentation_dataset(self,
+  #                              segmentation_range: Tuple[int, int]
+  #                              ) -> tf.data.Dataset:
+  #   dataset = tf.data.Dataset.from_tensor_slices(
+  #       list(range(*segmentation_range))
+  #       )
+  #   dataset = dataset.map(self.pre_segmentation_pairs)
+
+  #   return dataset
+
+  # def post_segmentation_dataset(self,
+  #                               segmentation_range: Tuple[int, int]
+  #                               ) -> tf.data.Dataset:
+  #   dataset = tf.data.Dataset.from_tensor_slices(
+  #       list(range(*segmentation_range))
+  #       )
+  #   dataset = dataset.map(self.post_segmentation_pairs)
+
+  #   return dataset
 
 def split_into_patches(image: np.array,
                        patch_size: Tuple[int, int, int] = (24,32,32)
@@ -242,14 +245,13 @@ def split_into_patches(image: np.array,
   return patches
 
 
-def sew_patches(patches: List[np.array], 
+def sew_patches(patches: List[np.array],
                 image_size: Tuple[int, int, int] = (24,256,256)
                 ) -> np.array:
 
-  slices, height, width = image_size
-  (slice_patch, height_patch, width_patch) = patches[0].shape[:3]
+  height, width = image_size[1:]
+  (height_patch, width_patch) = patches[0].shape[1:3]
 
-  slice_range  = math.ceil(slices / slice_patch)
   height_range = math.ceil(height / height_patch)
   width_range  = math.ceil(width  / width_patch)
 

@@ -45,5 +45,5 @@ jobs:
         python -m pip install pylint
 
     - name: Lint with pylint
-      run: pylint --rcfile=.pylintrc ganondorf
+      run: pylint --rcfile=.pylintrc -j 0 ganondorf
 

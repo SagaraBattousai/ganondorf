@@ -2,10 +2,10 @@
 """
 import tensorflow as tf
 from . import residual
-from .blocks import encoder_block, decoder_block, ConvMed 
+from .blocks import encoder_block, decoder_block, ConvMed
 
-def Generator():
-  OUTPUT_CHANNELS = 1
+def Generator(): # pylint: disable=C0103
+  OUTPUT_CHANNELS = 1 # pylint: disable=C0103
 
   inputs = tf.keras.layers.Input(shape=[24,32,32,1])
 
@@ -40,7 +40,7 @@ def Generator():
   last = ConvMed(filters=OUTPUT_CHANNELS,
                  strides=1,
                  kernel_initializer=initializer,
-                 activation='tanh')  # (bs, 24, 32, 32, 1)
+                 activation="tanh")  # (bs, 24, 32, 32, 1)
 
   x = inputs
 
@@ -70,9 +70,9 @@ def Generator():
 def generator_loss(target, gen_output, disc_gen_output):
   """ DOC
 
-      L_cycle = Not Implemented 
+      L_cycle = Not Implemented
         E(x,y)~(Pre_pair, Post_pair)(||G(pre -> post)[G(post -> pre)(x)] - x||₁)
-      
+
       pair_loss = E(x,y)~(Pre_pair, Post_pair)(||G(pre -> post)(x) − y||₁
 
       L_adv = E(x,y)~(Pre, Post)[(D(post)(G(pre -> post)(x)) − 1)²]
@@ -92,7 +92,12 @@ loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
 
 def generator_loss_alt(target, gen_output, disc_generated_output):
-  gan_loss = loss_object(tf.ones_like(disc_generated_output), disc_generated_output)
+  gan_loss = loss_object(
+      tf.ones_like(
+          disc_generated_output
+          ),
+      disc_generated_output
+      )
 
   # mean absolute error
   l1_loss = tf.reduce_mean(tf.abs(target - gen_output))

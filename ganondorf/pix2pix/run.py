@@ -20,7 +20,7 @@ def show_model_output(model, input_data):
   plt.show()
 
 def plot_model(model, savename: str = None):
-  if savename == None:
+  if savename is None:
     savename = f"{model.name}.png" if model.name != "" else "model_plot.png"
 
   tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file=savename)
@@ -28,7 +28,7 @@ def plot_model(model, savename: str = None):
 def generate_images(model, test_input, target, epoch:int):
   prediction = model(test_input, training=True)
   plt.figure(figsize=(12, 12))
- 
+
   test_input = gds.sew_patches(test_input)
   target = gds.sew_patches(target)
   prediction = gds.sew_patches(prediction)
@@ -41,7 +41,7 @@ def generate_images(model, test_input, target, epoch:int):
     plt.title(title[i])
 
     plt.imshow(display_list[i])  # May need to window and level
-    plt.axis('off')
+    plt.axis("off")
 
   plt.savefig(os.path.join(os.path.dirname(__file__),
                            "..",
@@ -62,7 +62,7 @@ def train_step_tf_tut(input_image,
                discriminator_optimizer,
                epoch,
                summary_writer=None):
- 
+
   with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
     gen_output = generator(input_image, training=True)
 
@@ -96,23 +96,23 @@ def train_step_tf_tut(input_image,
       )
 
 
-  if summary_writer != None:
+  if summary_writer is not None:
     with summary_writer.as_default():
-      tf.summary.scalar('gen_total_loss', gen_loss, step=epoch)
-      tf.summary.scalar('pair_loss', pair_loss, step=epoch)
-      tf.summary.scalar('adversarial_loss', adversarial_loss, step=epoch)
-      tf.summary.scalar('disc_loss', disc_loss, step=epoch)
+      tf.summary.scalar("gen_total_loss", gen_loss, step=epoch)
+      tf.summary.scalar("pair_loss", pair_loss, step=epoch)
+      tf.summary.scalar("adversarial_loss", adversarial_loss, step=epoch)
+      tf.summary.scalar("disc_loss", disc_loss, step=epoch)
 
 
 
 
-"""
-We adopted Adam [38] as the optimizer to train the model
-with a learning rate of 10−4. Other hyper-parameters were
-empirically set as K = 3, α = 1, λ1 = 0.5, λ2 = 0.05,
-λ3 = 0.1, λ4 = 0.5, and λ5 = 0.5.
-  
-"""
+
+#We adopted Adam [38] as the optimizer to train the model
+#with a learning rate of 10−4. Other hyper-parameters were
+#empirically set as K = 3, α = 1, λ1 = 0.5, λ2 = 0.05,
+#λ3 = 0.1, λ4 = 0.5, and λ5 = 0.5.
+
+
 
 
 @tf.function
@@ -126,7 +126,7 @@ def train_step(input_image,
                discriminator_optimizer,
                epoch,
                summary_writer=None):
- 
+
   # Train Discriminator with fixed Generator
   with tf.GradientTape() as disc_tape:
     gen_output = generator(input_image, training=True)
@@ -167,12 +167,12 @@ def train_step(input_image,
           generator.trainable_variables)
       )
 
-  if summary_writer != None:
+  if summary_writer is not None:
     with summary_writer.as_default():
-      tf.summary.scalar('gen_total_loss', gen_loss, step=epoch)
-      tf.summary.scalar('pair_loss', pair_loss, step=epoch)
-      tf.summary.scalar('adversarial_loss', adversarial_loss, step=epoch)
-      tf.summary.scalar('disc_loss', disc_loss, step=epoch)
+      tf.summary.scalar("gen_total_loss", gen_loss, step=epoch)
+      tf.summary.scalar("pair_loss", pair_loss, step=epoch)
+      tf.summary.scalar("adversarial_loss", adversarial_loss, step=epoch)
+      tf.summary.scalar("disc_loss", disc_loss, step=epoch)
 
 
 
@@ -201,7 +201,7 @@ def fit(generator,
 
     # Train
     for n, (input_image, target) in train_dataset.enumerate():
-      print('.', end='')
+      print(".", end="")
       if (n + 1) % 100 == 0:
         print()
 
@@ -225,7 +225,7 @@ def fit(generator,
     if (epoch + 1) % 20 == 0:
       checkpoint.save(file_prefix=checkpoint_prefix)
 
-    print(f'Time taken for epoch {epoch + 1} is {time.time() - start} sec\n')
+    print(f"Time taken for epoch {epoch + 1} is {time.time() - start} sec\n")
 
   checkpoint.save(file_prefix=checkpoint_prefix)
 

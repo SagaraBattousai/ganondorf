@@ -7,13 +7,12 @@ import numpy as np
 import os
 from typing import Sequence, Tuple
 import tensorflow as tf
-import SimpleITK as sitk
 from ganondorf.core import datamodule as data
 
 def window_level(hound_image: np.array, window: int, level:int) -> np.array:
 
   image = hound_image.copy()  # ?????????
-  
+
   if image.ndim == 3:
     half_window = window // 2
     window_min = level - half_window
@@ -42,11 +41,12 @@ def window_level(hound_image: np.array, window: int, level:int) -> np.array:
 
   return image
 
-def signed_hex(num: int, bits: int = 16) -> str:
-  pass
 
-def color_level(hound_image: np.array) -> np.array:
-  pass
+#def signed_hex(num: int, bits: int = 16) -> str:
+#  pass
+
+#def color_level(hound_image: np.array) -> np.array:
+#  pass
 
 
 def resize_nii(image_filename: str,
@@ -57,8 +57,7 @@ def resize_nii(image_filename: str,
   dtype = arr.dtype
 
   if arr.ndim == 3:
-    shape = arr.shape
-    arr = arr.reshape(shape[0], shape[1], shape[2], 1)
+    arr = arr[..., np.newaxis]#.reshape(shape[0], shape[1], shape[2], 1)
 
   tensor = tf.convert_to_tensor(arr, dtype=dtype)
   image = tf.image.resize(tensor, size, method=method)
@@ -114,8 +113,13 @@ def resize_image(image_name: str,
   return out_image
 
 def fix_aspect_ratio(img: np.array) -> np.array:
-  arrs = [arr for arr in img]
-  h, w = arrs[0].shape
+  if img.ndim == 2:
+    h, w = img.shape
+  elif img.ndim < 5:
+    h, w = img.shape[1:3]
+  else:
+    h, w = img.shape[-2:img.ndim]
+
   (left, right, top, bottom) = (0,0,0,0)
 
   if h > w:
@@ -130,7 +134,7 @@ def fix_aspect_ratio(img: np.array) -> np.array:
     return img
 
   out_arrs = [np.pad(arr, ((top, bottom), (left,right)), constant_values=0) \
-              for arr in arrs]
+              for arr in img]
 
   return np.stack(out_arrs, 0)
 
@@ -146,7 +150,7 @@ def resize_image_and_save(image_name: str,
                           interpolator = sitk.sitkNearestNeighbor,
                           save_name: str = None) -> None:
 
-  save_name = save_name if save_name != None else image_name
+  save_name = save_name if save_name is not None else image_name
 
   image = resize_image(image_name, new_size, interpolator)
 
@@ -154,7 +158,7 @@ def resize_image_and_save(image_name: str,
 
 def fix_aspect_ratio_and_save(img_name: str, save_name: str = None) -> None:
 
-  save_name = save_name if save_name != None else img_name
+  save_name = save_name if save_name is not None else img_name
   image = fix_aspect_ratio(img_name)
 
   sitk.WriteImage(image, save_name)
@@ -186,7 +190,7 @@ def square_image(filenames: Sequence[str],
   for i, fname in enumerate(filenames):
     arr = np.asarray(PIL.Image.open(fname))
     img = PIL.Image.fromarray(square_pad(arr))
-    outname = fname if out_filenames == None else out_filenames[i]
+    outname = fname if out_filenames is None else out_filenames[i]
 
     img.save(outname)
 

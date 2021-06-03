@@ -199,7 +199,9 @@ property-classes=abc.abstractproperty,cached_property.cached_property,cached_pro
 function-rgx=^(?:(?P<exempt>setUp|tearDown|setUpModule|tearDownModule)|(?P<camel_case>_?[A-Z][a-zA-Z0-9]*)|(?P<snake_case>_?[a-z][a-z0-9_]*))$
 
 # Regular expression matching correct variable names
-variable-rgx=^[a-z][a-z0-9_]*$
+# variable-rgx=^[a-z][a-z0-9_]*$
+# Allow variable to be "constants"
+variable-rgx=^([a-z][a-z0-9_]*|[A-Z][A-Z0-9_]*)$ 
 
 # Regular expression matching correct constant names
 const-rgx=^(_?[A-Z][A-Z0-9_]*|__[a-z0-9_]+__|_?[a-z][a-z0-9_]*)$
@@ -220,7 +222,8 @@ inlinevar-rgx=^[a-z][a-z0-9_]*$
 class-rgx=^_?[A-Z][a-zA-Z0-9]*$
 
 # Regular expression matching correct module names
-module-rgx=^(_?[a-z][a-z0-9_]*|__init__)$
+# module-rgx=^(_?[a-z][a-z0-9_]*|__init__)$
+module-rgx=^(_?[a-z][a-z0-9_]*|__init__|__main__)$
 
 # Regular expression matching correct method names
 method-rgx=(?x)^(?:(?P<exempt>_[a-z0-9_]+__|runTest|setUp|tearDown|setUpTestCase|tearDownTestCase|setupSelf|tearDownClass|setUpClass|(test|assert)_*[A-Z0-9][a-zA-Z0-9_]*|next)|(?P<camel_case>_{0,2}[A-Z][a-zA-Z0-9_]*)|(?P<snake_case>_{0,2}[a-z][a-z0-9_]*))$

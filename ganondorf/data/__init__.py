@@ -58,8 +58,8 @@ def load_npz_dataset(filename: str, client_ids: Iterable[str],
 
   return train_client_data, test_client_data
 
-def load_builtin_dataset(data_filename: str, 
-                         relative_dir: str, 
+def load_builtin_dataset(data_filename: str,
+                         relative_dir: str,
                          client_id_range: Tuple[int, int]
                          ) -> Tuple[TffClientData, TffClientData]:
 
@@ -78,14 +78,14 @@ def load_builtin_dataset(data_filename: str,
 
 def load_arcm_dataset(normalised: bool = False
                       ) -> Tuple[TffClientData, TffClientData]:
-  
+
   data_filename = "arcm_data_norm.npz" if normalised else "arcm_data.npz"
 
   return load_builtin_dataset(data_filename, "arcm", ARCM_CLIENT_ID_RANGE)
 
 def load_mhealth_dataset(normalised: bool = False
                            ) -> Tuple[TffClientData, TffClientData]:
-    
+
   data_filename = "mHealth_data_norm.npz" if normalised else "mHealth_data.npz"
 
   return load_builtin_dataset(data_filename, "mHealth", MHEALTH_CLIENT_ID_RANGE)

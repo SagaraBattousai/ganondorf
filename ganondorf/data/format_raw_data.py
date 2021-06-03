@@ -5,7 +5,7 @@ import csv
 import random
 from multiprocessing import Pool
 from functools import partial
-from typing import Tuple, Dict, Sequence, Iterable, Callable, List
+from typing import Tuple, Dict, Sequence, Iterable, List
 import numpy as np
 
 BASE_DATASET_DIR = os.path.dirname(os.path.realpath(__file__)) + "/dataset"

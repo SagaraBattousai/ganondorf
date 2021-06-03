@@ -1,4 +1,4 @@
-""" 
+"""
   Module containing the interface for loading a dataset
   as a tensorflow dataset and an ArrayLoader as a trivial but useful example
 """
@@ -14,7 +14,7 @@ class Loader(ABC):
 
   @abstractmethod
   def load_dataset(self) -> tf.data.Dataset:
-    """ 
+    """
     Single Interface method defining how to load a dataset as an instance of
     a tensorflow Dataset
     """

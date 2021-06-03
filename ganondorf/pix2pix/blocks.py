@@ -4,14 +4,13 @@ Block are reusable sequences of layers
 """
 from typing import Callable
 import functools
-import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 
 
 ConvMed = functools.partial(tf.keras.layers.Conv3D,
                             kernel_size=(3,3,3),
-                            padding='same',
+                            padding="same",
                             #use_bias=False
                             )
 
@@ -23,7 +22,7 @@ NormalizeMed = functools.partial(tfa.layers.InstanceNormalization,
 
 
 def encoder_block(
-    filters: int, 
+    filters: int,
     name: str="",
     instance_norm_mask: int = 0b11,
     activation: Callable[[], tf.keras.layers.Layer] = tf.keras.layers.ReLU
@@ -34,7 +33,7 @@ def encoder_block(
   ----------
 
   filters : int
-    Number of filters to use for the block's two convolutional layers.
+    Number of filters to use for the block"s two convolutional layers.
 
   name : str, optional
     The name to use for the block to aid in debugging, defaults to "encoder".
@@ -52,14 +51,14 @@ def encoder_block(
 
   result.add(ConvMed(filters, strides=1, kernel_initializer=initializer))
 
-  if (instance_norm_mask & 0b01):
+  if instance_norm_mask & 0b01:
     result.add(NormalizeMed())
 
   result.add(activation())
 
   result.add(ConvMed(filters, strides=2, kernel_initializer=initializer))
 
-  if (instance_norm_mask & 0b10):
+  if instance_norm_mask & 0b10:
     result.add(NormalizeMed())
 
   result.add(activation())
@@ -67,7 +66,7 @@ def encoder_block(
   return result
 
 
-def decoder_block(filters: int, 
+def decoder_block(filters: int,
                   name: str="",
                   instance_norm_mask: int = 0b11
                   ) -> tf.keras.Sequential:
@@ -77,7 +76,7 @@ def decoder_block(filters: int,
   ----------
 
   filters : int
-    Number of filters to use for the block's convolutional and
+    Number of filters to use for the block"s convolutional and
     transposed convolutional layers.
 
   name : str, optional
@@ -96,19 +95,19 @@ def decoder_block(filters: int,
 
   result.add(
       tf.keras.layers.Conv3DTranspose(
-          filters, (3,3,3), strides=2, padding='same',
+          filters, (3,3,3), strides=2, padding="same",
           kernel_initializer=initializer, use_bias=False
           )
       )
 
-  if (instance_norm_mask & 0b01):
+  if instance_norm_mask & 0b01:
     result.add(NormalizeMed())
 
   result.add(tf.keras.layers.ReLU())
 
   result.add(ConvMed(filters, strides=1, kernel_initializer=initializer))
 
-  if (instance_norm_mask & 0b10):
+  if instance_norm_mask & 0b10:
     result.add(NormalizeMed())
 
   result.add(tf.keras.layers.ReLU())

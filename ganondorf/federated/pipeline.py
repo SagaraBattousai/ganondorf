@@ -1,7 +1,6 @@
 """ DOC STRING """
 
 import collections
-import numpy as np
 from functools import partial
 import tensorflow as tf
 import tensorflow_federated as tff
@@ -35,7 +34,7 @@ def preprocess_client_data(client_data: tff.simulation.ClientData,
                            shuffle_buffer: int = 1000000,
                            prefetch_buffer: int = 100
                            ):
-  preprocess_client = partial(preprocess, 
+  preprocess_client = partial(preprocess,
                               input_shape=input_shape,
                               label_shape=label_shape,
                               num_epochs=num_epochs,

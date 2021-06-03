@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import tensorflow_federated as tff
-import matplotlib.pyplot as plt
 from tensorflow_federated.python.simulation import ClientData as TffClientData
 
-def normal_quantiles(length: int, 
-                     mu:float=0.0, 
+def normal_quantiles(length: int,
+                     mu:float=0.0,
                      sigma:float=1.0)-> Generator[float, None, None]:
 
   norm_dist = statistics.NormalDist(mu=mu, sigma=sigma)
@@ -25,8 +24,8 @@ def normal_quantiles(length: int,
     current += splits
     count += 1
 
-def QQ_plot(data,
-            mu:float=0.0, sigma:float=1.0): #pylint: disable=invalid-name
+def QQ_plot(data, #pylint: disable=C0103
+            mu:float=0.0, sigma:float=1.0):
   normal_data = normal_quantiles(len(data) + 1, mu=mu, sigma=sigma)
   x = list(normal_data)[:-1]
   plt.plot(x, data)
