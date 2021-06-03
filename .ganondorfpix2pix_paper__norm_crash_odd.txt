@@ -1,0 +1,111 @@
+
+Epoch:  115
+..........
+Time taken for epoch 116 is 50.963226079940796 sec
+
+Epoch:  116
+..........
+Time taken for epoch 117 is 57.05773210525513 sec
+
+Epoch:  117
+..........
+Time taken for epoch 118 is 52.690672874450684 sec
+
+Epoch:  118
+..........
+Time taken for epoch 119 is 49.558354139328 sec
+
+Epoch:  119
+..........
+Time taken for epoch 120 is 51.428611278533936 sec
+
+Epoch:  120
+..........
+Time taken for epoch 121 is 55.92932176589966 sec
+
+Epoch:  121
+..........
+Time taken for epoch 122 is 52.79978013038635 sec
+
+Epoch:  122
+..........
+Time taken for epoch 123 is 50.31921076774597 sec
+
+Epoch:  123
+..........
+Time taken for epoch 124 is 50.31287169456482 sec
+
+Epoch:  124
+..........
+Time taken for epoch 125 is 56.16750741004944 sec
+
+Epoch:  125
+..........
+Time taken for epoch 126 is 56.32679510116577 sec
+
+Epoch:  126
+..........
+Time taken for epoch 127 is 50.80016803741455 sec
+
+Epoch:  127
+..........
+Time taken for epoch 128 is 49.927717447280884 sec
+
+Epoch:  128
+..........
+Time taken for epoch 129 is 742.3998837471008 sec
+
+Epoch:  129
+..........
+Time taken for epoch 130 is 53.722984790802 sec
+
+Epoch:  130
+..........
+Time taken for epoch 131 is 49.182175397872925 sec
+
+Epoch:  131
+..........
+Time taken for epoch 132 is 50.83175587654114 sec
+
+Epoch:  132
+Traceback (most recent call last):
+  File "C:\Python\lib\site-packages\tensorflow\python\eager\context.py", line 2102, in execution_mode
+    yield
+  File "C:\Python\lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 755, in _next_internal
+    ret = gen_dataset_ops.iterator_get_next(
+  File "C:\Python\lib\site-packages\tensorflow\python\ops\gen_dataset_ops.py", line 2610, in iterator_get_next
+    _ops.raise_from_not_ok_status(e, name)
+  File "C:\Python\lib\site-packages\tensorflow\python\framework\ops.py", line 6843, in raise_from_not_ok_status
+    six.raise_from(core._status_to_exception(e.code, message), None)
+  File "<string>", line 3, in raise_from
+tensorflow.python.framework.errors_impl.ResourceExhaustedError: OOM when allocating tensor with shape[24,32,32,1] and type float on /job:localhost/replica:0/task:0/device:CPU:0 by allocator cpu
+         [[{{node strided_slice_43}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info.
+ [Op:IteratorGetNext]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python\lib\runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "C:\Python\lib\runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "C:\Users\james\ganondorf\ganondorf\__main__.py", line 131, in <module>
+    p2p.fit(generator=generator,
+  File "C:\Users\james\ganondorf\ganondorf\pix2pix\run.py", line 202, in fit
+    for n, (input_image, target) in train_dataset.enumerate():
+  File "C:\Python\lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 736, in __next__
+    return self.next()
+  File "C:\Python\lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 772, in next
+    return self._next_internal()
+  File "C:\Python\lib\site-packages\tensorflow\python\data\ops\iterator_ops.py", line 764, in _next_internal
+    return structure.from_compatible_tensor_list(self._element_spec, ret)
+  File "C:\Python\lib\contextlib.py", line 131, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "C:\Python\lib\site-packages\tensorflow\python\eager\context.py", line 2105, in execution_mode
+    executor_new.wait()
+  File "C:\Python\lib\site-packages\tensorflow\python\eager\executor.py", line 67, in wait
+    pywrap_tfe.TFE_ExecutorWaitForAllPendingNodes(self._handle)
+tensorflow.python.framework.errors_impl.ResourceExhaustedError: OOM when allocating tensor with shape[24,32,32,1] and type float on /job:localhost/replica:0/task:0/device:CPU:0 by allocator cpu
+         [[{{node strided_slice_43}}]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info.

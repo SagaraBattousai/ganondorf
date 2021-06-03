@@ -1,0 +1,37 @@
+in, out, count, stride
+
+
+16, 64, 18, 1
+64, 128, 18, 2
+128, 256, 18, 2
+
+
+run 1 -> conv (16 -> 16)  (1x1) 1
+         conv (16 -> 16)  (3x3) 1 pad width and height by 1
+         conv (16 -> 64)  (1x1) 1 
+
+run 2 -> conv (64 -> 32)  (1x1) 2
+         conv (32 -> 32)  (3x3) 1 pad width and height by 1
+         conv (32 -> 128) (1x1) 1
+
+run 3 -> conv (128 -> 64) (1x1) 2
+         conv (64 -> 64)  (3x3) 1 pad width and height by 1
+         conv (64 -> 256) (1x1) 1
+
+where
+in, out are the filters
+
+
+
+>>> disp(128, 128, 2)
+conv (128 -> 32) (1x1) 2
+conv (32 -> 32) (3x3) 1 pad width and height by 1
+conv (32 -> 128) (1x1) 1
+>>> def disp(inp, out, stride):
+...     print( (f"conv ({inp} -> {out // 4}) (1x1) {stride}"
+...             f"\nconv ({out //4} -> {out // 4}) (3x3) 1 pad width and height by 1"
+...             f"\nconv ({out // 4} -> {out}) (1x1) 1")
+...     )
+...
+>>>
+
