@@ -2,7 +2,7 @@
 """
 import tensorflow as tf
 from . import residual
-from .blocks import encoder_block, decoder_block, ConvMed
+from .blocks import encoder_block_3D, decoder_block_3D, ConvMed
 
 def Generator(): # pylint: disable=C0103
   OUTPUT_CHANNELS = 1 # pylint: disable=C0103
@@ -10,13 +10,13 @@ def Generator(): # pylint: disable=C0103
   inputs = tf.keras.layers.Input(shape=[24,32,32,1])
 
   encoder_stack = [
-      encoder_block(32,
+      encoder_block_3D(32,
                     name="encode_block_1",
                     activation=tf.keras.layers.ReLU),  # (bs, 12, 16, 16, 32)
-      encoder_block(64,
+      encoder_block_3D(64,
                     name="encode_block_2",
                     activation=tf.keras.layers.ReLU),  # (bs,  6,  8,  8, 64)
-      encoder_block(128,
+      encoder_block_3D(128,
                     name="encode_block_3",
                     activation=tf.keras.layers.ReLU),  # (bs,  3,  4,  4, 128)
       ]
@@ -30,9 +30,9 @@ def Generator(): # pylint: disable=C0103
   after_residual_activation = tf.keras.layers.ReLU()
 
   decoder_stack = [
-      decoder_block(128, name="decode_block_1"),  # (bs,  6,  8,  8, 128)
-      decoder_block(64,  name="decode_block_2"),  # (bs, 12, 16, 16, 64)
-      decoder_block(32,  name="decode_block_3"),  # (bs, 24, 32, 32, 32)
+      decoder_block_3D(128, name="decode_block_1"),  # (bs,  6,  8,  8, 128)
+      decoder_block_3D(64,  name="decode_block_2"),  # (bs, 12, 16, 16, 64)
+      decoder_block_3D(32,  name="decode_block_3"),  # (bs, 24, 32, 32, 32)
       ]
 
 

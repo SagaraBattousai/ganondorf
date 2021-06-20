@@ -7,7 +7,7 @@ import numpy as np
 import os
 from typing import Sequence, Tuple
 import tensorflow as tf
-from ganondorf.core import datamodule as data
+from ganondorf.core import datacore
 
 def window_level(hound_image: np.array, window: int, level:int) -> np.array:
 
@@ -37,7 +37,7 @@ def window_level(hound_image: np.array, window: int, level:int) -> np.array:
     image = image * (255 / max_matrix)
 
   else:
-    image = data.window_level(image, window, level)
+    image = datacore.window_level(image, window, level)
 
   return image
 
@@ -48,6 +48,85 @@ def window_level(hound_image: np.array, window: int, level:int) -> np.array:
 #def color_level(hound_image: np.array) -> np.array:
 #  pass
 
+def image_as_array(image: PIL.Image.Image, mode: str=None) -> np.array:
+  if mode is not None:
+    image = image.convert(mode=mode)
+  
+  arr = np.asarray(image)
+  if mode == '1':
+    arr = arr.astype(np.uint8)
+    arr[arr > 0] = 1
+
+  if arr.ndim == 2:
+    arr = arr[..., np.newaxis]
+  return arr
+
+def medical_as_array(image: sitk.Image) -> np.array:
+  return sitk.GetArrayFromImage(image).astype(np.float32)[..., np.newaxis]
+
+def as_mask(img):
+  arr = np.asarray(img)
+  arr = arr.copy()
+  arr[arr > 0] = 255
+  img = Image.fromarray(arr)
+  img = img.convert(mode='1')
+  return img
+
+def split_into_patches(image: np.array,
+                       patch_size: Tuple[int, int, int] = (24,32,32)
+                       ) -> List[np.array]:
+
+  slices, height, width = image.shape[:3]
+  (slice_patch, height_patch, width_patch) = patch_size
+
+  slice_range  = math.ceil(slices / slice_patch)
+  height_range = math.ceil(height / height_patch)
+  width_range  = math.ceil(width  / width_patch)
+
+  patches = []
+
+  for i in range(slice_range):
+    slice_start = i * slice_patch
+    slice_end   = (i + 1) * slice_patch
+    for j in range(height_range):
+      height_start = j * height_patch
+      height_end   = (j + 1) * height_patch
+      for k in range(width_range):
+        width_start = k * width_patch
+        width_end   = (k + 1) * width_patch
+
+        patches.append(image[slice_start  : slice_end,\
+                             height_start : height_end,\
+                             width_start  : width_end])
+
+  return patches
+
+
+def sew_patches(patches: List[np.array],
+                image_size: Tuple[int, int, int] = (24,256,256)
+                ) -> np.array:
+
+  height, width = image_size[1:]
+  (height_patch, width_patch) = patches[0].shape[1:3]
+
+  height_range = math.ceil(height / height_patch)
+  width_range  = math.ceil(width  / width_patch)
+
+  width_counts = len(patches) // width_range
+
+  width_patches = \
+      [np.concatenate(patches[i * width_range : width_range * (i + 1)], axis=2)\
+       for i in range(width_counts)]
+
+  height_counts = len(width_patches) // height_range
+
+  height_patches = \
+      [np.concatenate(
+          width_patches[i * height_range : (i+1) * height_range],
+          axis=1
+          ) for i in range(height_counts)]
+
+  return np.concatenate(height_patches, axis=0)
 
 def resize_nii(image_filename: str,
                size: Sequence[int],
@@ -57,7 +136,7 @@ def resize_nii(image_filename: str,
   dtype = arr.dtype
 
   if arr.ndim == 3:
-    arr = arr[..., np.newaxis]#.reshape(shape[0], shape[1], shape[2], 1)
+    arr = arr[..., np.newaxis]
 
   tensor = tf.convert_to_tensor(arr, dtype=dtype)
   image = tf.image.resize(tensor, size, method=method)
@@ -82,14 +161,18 @@ def convert_dir_images_to_nii(outname: str = "out.nii",
   img = sitk.GetImageFromArray(arr)
   sitk.WriteImage(img, outname, imageIO="NiftiImageIO")
 
-def resize_image(image_name: str,
+def resize_medical_image(image_name: str,
                  new_size: Tuple[int, int] = (256, 256),
                  interpolator = sitk.sitkNearestNeighbor,
                  ) -> sitk.SimpleITK.Image:
   """ Resizes Images to a new shape preserving slice count
 
   """
-  image = sitk.ReadImage(image_name)
+  try:
+    image = sitk.ReadImage(image_name)
+  except RuntimeError as re:
+    print(re)
+    return None
 
   orig_size = image.GetSize()
   orig_spacing = image.GetSpacing()
@@ -112,9 +195,21 @@ def resize_image(image_name: str,
                             outputSpacing=new_spacing)
   return out_image
 
+
+def resize_image(image_name: str, #  Not always going to be str
+                 new_size: tuple[int, int] = (256, 256),
+                 interpolator = PIL.Image.NEAREST,
+                 roi: tuple[float, float, float, float] = None,
+                 reducing_gap:float=None
+                 ) -> PIL.Image.Image:
+  image = PIL.Image.open(image_name)
+  return image.resize(new_size, interpolator, roi, reducing_gap)
+
+
 def fix_aspect_ratio(img: np.array) -> np.array:
   if img.ndim == 2:
     h, w = img.shape
+    img = img[np.newaxis, ...]
   elif img.ndim < 5:
     h, w = img.shape[1:3]
   else:
@@ -133,8 +228,13 @@ def fix_aspect_ratio(img: np.array) -> np.array:
   else:
     return img
 
-  out_arrs = [np.pad(arr, ((top, bottom), (left,right)), constant_values=0) \
-              for arr in img]
+  if img.ndim == 2:
+    pad = ((top, bottom), (left,right))
+  else:
+    extra_dims = img.ndim - 3 # 2 for width and height and 1 for leading
+    pad = ((top, bottom), (left,right), *([(0,0)] * extra_dims))
+
+  out_arrs = [np.pad(arr, pad, constant_values=0) for arr in img]
 
   return np.stack(out_arrs, 0)
 
@@ -153,8 +253,9 @@ def resize_image_and_save(image_name: str,
   save_name = save_name if save_name is not None else image_name
 
   image = resize_image(image_name, new_size, interpolator)
-
-  sitk.WriteImage(image, save_name)
+  
+  if iamge is not None:
+    sitk.WriteImage(image, save_name)
 
 def fix_aspect_ratio_and_save(img_name: str, save_name: str = None) -> None:
 
@@ -185,10 +286,16 @@ def square_pad(image: np.array)-> np.array:
     return image
   return np.pad(image, ((t, b), (l, r), (0, 0)), constant_values=0)
 
-def square_image(filenames: Sequence[str],
+def square_images(filenames: Sequence[str],
                  out_filenames: Sequence[str] = None):
   for i, fname in enumerate(filenames):
-    arr = np.asarray(PIL.Image.open(fname))
+    try:
+      arr = np.asarray(PIL.Image.open(fname))
+    except PIL.UnidentifiedImageError as uie:
+      print(uie)
+      print("Skipping non image file")
+      continue
+
     img = PIL.Image.fromarray(square_pad(arr))
     outname = fname if out_filenames is None else out_filenames[i]
 

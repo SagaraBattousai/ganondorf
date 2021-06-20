@@ -2,7 +2,7 @@
 """
 import functools
 import tensorflow as tf
-from .blocks import encoder_block #, NormalizeMed
+from .blocks import encoder_block_3D #, InstNormalize
 
 LeakyReLUMed = functools.partial(tf.keras.layers.LeakyReLU,
                                  alpha=0.2,
@@ -15,13 +15,13 @@ def Discriminator(): #pylint: disable=C0103
   real      = tf.keras.layers.Input(shape=[24,32,32,1], name="target_image")
 
   encoder_stack = [
-      encoder_block(32,
+      encoder_block_3D(32,
                     name="encode_disc_block_1",
                     activation=LeakyReLUMed),  # (bs, 12, 16, 16, 32)
-      encoder_block(64,
+      encoder_block_3D(64,
                     name="encode_disc_block_2",
                     activation=LeakyReLUMed),  # (bs,  6,  8,  8, 64)
-      encoder_block(128,
+      encoder_block_3D(128,
                     name="encode_disc_block_3",
                     activation=LeakyReLUMed),  # (bs,  3,  4,  4, 128)
       ]
@@ -30,7 +30,7 @@ def Discriminator(): #pylint: disable=C0103
                                       kernel_size=(3, 3, 3),
                                       strides=(1, 1, 1),
                                       padding="valid")# ????
-  #final_norm = NormalizeMed() #?????Do we normalise the final one???
+  #final_norm = InstNormalize() #?????Do we normalise the final one???
 
   final_activation = LeakyReLUMed()
 

@@ -8,16 +8,20 @@
 
 #include <numpy/arrayobject.h>
 
+typedef struct value_count
+{
+  int value;
+  int count;
+} value_count_t;
 
 PyObject *sum_array(PyObject *arr, int rtype)
 {
-  PyObject *sum;
 
   if (PyArray_NDIM(arr) == 1)
   {
     PyArrayObject *input[1] = { arr };
 
-    sum = PyArray_EinsteinSum("i->", 1, input, PyArray_DescrNewFromType(rtype), NPY_KEEPORDER, NPY_SAFE_CASTING, NULL);
+    PyArrayObject *sum = PyArray_EinsteinSum("i->", 1, input, PyArray_DescrNewFromType(rtype), NPY_KEEPORDER, NPY_SAFE_CASTING, NULL);
 
     return PyLong_FromLong(*((long *)PyArray_GETPTR1(sum, 0)));
   }
@@ -88,3 +92,46 @@ PyObject *map_array(PyObject *arr, mappable_function func, ...)
 
   return arr;
 }
+
+
+/*
+PyObject *nearest_convolve(PyObject *arr)
+{
+  int ndim = PyArray_NDIM(arr);
+
+  if (ndim != 2)
+  {
+    return NULL; //Try and extend to 3D too
+  }
+
+  PyObject *out = PyArray_NewLikeArray(arr, NPY_CORDER, PyArray_DescrFromType(NPY_INT32), 1);
+
+  npy_intp *dims = PyArray_DIMS(arr);
+
+  for (int i = 0; i < *dims; i++)
+  {
+    for (int j = 0; j < *(dims + 1); j++)
+    {
+
+      npy_int32 *out_datapoint = (npy_int32 *)PyArray_GETPTR2(out, i, j);
+
+      int top_i    = i - 1;
+      int bottom_i = i + 1;
+      int front_j  = j - 1;
+      int end_j    = j + 1;
+
+      //i.e. is on boarder
+      if (top_i < 0 || front_j < 0 || bottom_i >= *dims || end_j >= *(dims + 1))
+      {
+        *out_datapoint = *((npy_int32 *) PyArray_GETPTR2(arr, i, j));
+        continue;
+      }
+
+
+    }
+  }
+
+
+}
+
+*/

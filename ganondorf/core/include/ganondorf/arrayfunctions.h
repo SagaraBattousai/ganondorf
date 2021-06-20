@@ -14,4 +14,6 @@ PyObject *map_array(PyObject *arr, mappable_function func, ...);
 
 PyObject *sum_array(PyObject *arr, int rtype);
 
+//PyObject *nearest_convolve(PyObject *arr);
+
 #endif

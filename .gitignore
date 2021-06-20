@@ -1,3 +1,9 @@
+
+
+# No images
+*.png
+*.jpg
+
 # No Secret Tokens
 .*_token
 
@@ -5,7 +11,8 @@
 ganondorf/tensorflow_outputs
 ganondorf/Generator_Output/
 ganondorf/training_checkpoints/
-ganondorf/data/datasets/datasets/*
+ganondorf/data/datasets/*
+!ganondorf/data/datasets/__init__.py
 # Ignore inplace C-Extension builds but reinclude source
 #ganondorf/core/*
 #!ganondorf/core/CMakeLists.txt

@@ -1,8 +1,16 @@
 """ Module for preprossessing raw datasets such as normalisation """
 import numpy as np
-from typing import Dict, TypeVar, Mapping
+from typing import TypeVar, Mapping, Sequence
 
 T = TypeVar("T")
+
+
+def stack_arrays(arrs: Sequence[np.array]) -> np.array:
+  arr = arrs[0]
+  for i in range(1, len(arrs)):
+    arr = np.vstack((arr, arrs[i]))
+  return arr
+
 
 #Bit concerend if ,in and max come from labels
 def normalise_data(data: np.array, label_index: int = None) -> np.array:
@@ -20,7 +28,7 @@ def normalise_labeled_data(data: np.array) -> np.array:
   return normalise_data(data, label_index = -1)
 
 def normalise_federated_dataset(dataset: Mapping[T, np.array],
-                                label_index: int = None) -> Dict[T, np.array]:
+                                label_index: int = None) -> dict[T, np.array]:
 
   return {key: normalise_data(dataset[key], label_index)
           for key in dataset}
@@ -34,7 +42,7 @@ def shift_labels(data: np.array,
 
 def shift_federated_labels(dataset: Mapping[T, np.array],
                            label_index: int = -1,
-                           shift_amount: int = 1) -> Dict[T, np.array]:
+                           shift_amount: int = 1) -> dict[T, np.array]:
 
   return {key: shift_labels(dataset[key], label_index, shift_amount)
           for key in dataset}

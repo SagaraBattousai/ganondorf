@@ -40,7 +40,7 @@ PyTypeObject PyDataset_Type = {
   .tp_doc = "Dataset Static Class",
   .tp_basicsize = sizeof(PyDatasetObject),
   .tp_itemsize = 0,
-  .tp_flags = Py_TPFLAGS_DEFAULT,
+  .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   .tp_new = PyType_GenericNew,
   .tp_methods = Dataset_methods,
 };
