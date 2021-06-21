@@ -44,7 +44,8 @@ def dir_to_mask(path):
 
 def load_image_pair_dataset(path:str, 
                             image_dirname:str="image",
-                            label_dirname:str="mask")->tf.data.Dataset:
+                            label_dirname:str="mask",
+                            size:tuple[int, int]=None)->tf.data.Dataset:
 
   dataset_path = resources.files(gdds).joinpath(path) #.open()
 
@@ -55,9 +56,15 @@ def load_image_pair_dataset(path:str,
   labels = []
 
   for img, lab in zip(image_files, label_files):
-    #TODO: decide if acceptable or not!
-    image = image_as_array(img) # Using path but in zip so not safe? 
-    label = image_as_array(lab, mode='1') #  Should already be in this form
+
+    if size is not None:
+      image = fid.image_as_array(fid.resize_image(img, size))
+      label = fid.image_as_array(fid.resize_image(lab, size), mode='1')
+    else:
+      #TODO: decide if acceptable or not!
+      image = image_as_array(img) # Using path but in zip so not safe? 
+      label = image_as_array(lab, mode='1') #  Should already be in this form
+       
 
     # dataset.append( {'image': image, 'label': label} )
     images.append(image)
@@ -105,18 +112,21 @@ def load_npz_dataset(path:str, label_index:int=-1)->tf.data.Dataset:
   return tf.data.Dataset.from_tensor_slices(dataset)
 
 def load_AL_segmentation(load_train = True,
-                         load_test = True)->tf.data.Dataset:
+                         load_test = True,
+                         size:tuple[int, int]=None)->tf.data.Dataset:
   path = "ALSegment"
   dataset = []
 
   if load_train:
     dataset.append(load_image_pair_dataset(path + "/train",
-                                           image_dirname:str="image",
-                                           label_dirname:str="mask"))
+                                           image_dirname="image",
+                                           label_dirname="mask",
+                                           size=size))
   if load_test:
     dataset.append(load_image_pair_dataset(path + "/test",
-                                           image_dirname:str="image",
-                                           label_dirname:str="mask"))
+                                           image_dirname="image",
+                                           label_dirname="mask",
+                                           size=size))
   if dataset == []:
     return None
   elif len(dataset) == 1:
@@ -161,16 +171,14 @@ def load_arcm(normalised:bool=False)->tf.data.Dataset:
 
   return load_npz_dataset(path)
 
-def load_mhealth(normalised: bool = False
-                           ) -> Tuple[TffClientData, TffClientData]:
+def load_mhealth(normalised:bool=False)->tf.data.Dataset:
 
   path = ("mHealth/"
           "mHealth_data_norm.npz" if normalised else "mHealth_data.npz")
 
   return load_npz_dataset(path)
 
-def load_har(normalised: bool = False
-                     ) -> Tuple[TffClientData, TffClientData]:
+def load_har(normalised:bool=False)->tf.data.Dataset:
 
   path = ("har/"
           "har_data_norm.npz" if normalised else "har_data.npz")

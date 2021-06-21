@@ -5,7 +5,7 @@ import PIL
 import SimpleITK as sitk
 import numpy as np
 import os
-from typing import Sequence, Tuple
+from typing import Sequence
 import tensorflow as tf
 from ganondorf.core import datacore
 
@@ -73,8 +73,8 @@ def as_mask(img):
   return img
 
 def split_into_patches(image: np.array,
-                       patch_size: Tuple[int, int, int] = (24,32,32)
-                       ) -> List[np.array]:
+                       patch_size: tuple[int, int, int] = (24,32,32)
+                       ) -> list[np.array]:
 
   slices, height, width = image.shape[:3]
   (slice_patch, height_patch, width_patch) = patch_size
@@ -102,8 +102,8 @@ def split_into_patches(image: np.array,
   return patches
 
 
-def sew_patches(patches: List[np.array],
-                image_size: Tuple[int, int, int] = (24,256,256)
+def sew_patches(patches: list[np.array],
+                image_size: tuple[int, int, int] = (24,256,256)
                 ) -> np.array:
 
   height, width = image_size[1:]
@@ -162,7 +162,7 @@ def convert_dir_images_to_nii(outname: str = "out.nii",
   sitk.WriteImage(img, outname, imageIO="NiftiImageIO")
 
 def resize_medical_image(image_name: str,
-                 new_size: Tuple[int, int] = (256, 256),
+                 new_size: tuple[int, int] = (256, 256),
                  interpolator = sitk.sitkNearestNeighbor,
                  ) -> sitk.SimpleITK.Image:
   """ Resizes Images to a new shape preserving slice count
@@ -246,7 +246,7 @@ def fix_med_aspect_ratio(img_name: str) -> sitk.SimpleITK.Image:
 
 
 def resize_image_and_save(image_name: str,
-                          new_size: Tuple[int, int] = (256, 256),
+                          new_size: tuple[int, int] = (256, 256),
                           interpolator = sitk.sitkNearestNeighbor,
                           save_name: str = None) -> None:
 

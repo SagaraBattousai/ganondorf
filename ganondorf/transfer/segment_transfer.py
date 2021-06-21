@@ -2,7 +2,9 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import ganondorf.data.datasets.segmentation_loader as segloader
+import ganondorf.data
+from ganondorf.pix2pix import residual
+from ganondorf.pix2pix import blocks
 
 from tensorflow_examples.models.pix2pix import pix2pix
 from tensorflow.keras.preprocessing import image_dataset_from_directory
@@ -43,33 +45,41 @@ def display(display_list):
 
 @tf.function
 def load_image_train(image, mask, image_shape=(128,128)):
-  input_image = tf.image.resize(image, image_shape)
-  input_mask  = tf.image.resize(mask, image_shape)
+  #input_image = tf.image.resize(image, image_shape)
+  #input_mask  = tf.image.resize(mask, image_shape)
 
   if tf.random.uniform(()) > 0.5:
-    input_image = tf.image.flip_left_right(input_image)
-    input_mask  = tf.image.flip_left_right(input_mask)
+    # input_image = tf.image.flip_left_right(image)#input_image)
+    # input_mask  = tf.image.flip_left_right(mask)#input_mask)
+    image = tf.image.flip_left_right(image)#input_image)
+    mask  = tf.image.flip_left_right(mask)#input_mask)
 
-  input_image = normalize(input_image)
+  # input_image = normalize(input_image)
+  image = normalize(image)
 
-  return input_image, input_mask
+  # return input_image, input_mask
+  return image, mask
 
 # Why no @tf.function?
 def load_image_test(image, mask, image_shape=(128,128)):
-  input_image = tf.image.resize(image, (128,128))
-  input_mask  = tf.image.resize(mask, image_shape)
+  #input_image = tf.image.resize(image, (128,128))
+  #input_mask  = tf.image.resize(mask, image_shape)
 
-  input_image = normalize(input_image)
+  input_image = normalize(image)#input_image)
 
-  return input_image, input_mask
+  return input_image, mask #input_mask
   
 
-def unet_model(output_channels, down_stack, up_stack):
+def unet_model(output_channels, down_stack, up_stack, res_stack=None):
   inputs = tf.keras.layers.Input(shape=[128,128,3])
 
   skips = down_stack(inputs)
   x = skips[-1]
   skips = reversed(skips[:-1])
+
+  if res_stack is not None:
+    for res in res_stack:
+      x = res(x)
 
   for up, skip in zip(up_stack, skips):
     x = up(x)
@@ -104,28 +114,31 @@ def show_predictions(model, dataset=None, num=1, simage=None, smask=None):
 class DisplayCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs=None):
     #clear_output(wait=True)
-    if (epoch + 1) % 5 == 0:
+    if (epoch + 1) % 10 == 0:
       show_predictions(self.model, simage=simage, smask=smask)
     print('\nSample Predictions after epoch {}\n'.format(epoch+1))
 
 
 if __name__ == '__main__':
 
-  DATASET_PATH = os.path.join(
-      "..","data","datasets","datasets","ALSegment"
-      )
+  # DATASET_PATH = os.path.join(
+  #     "..","data","datasets","datasets","ALSegment"
+  #     )
 
-  TRAIN_PATH = os.path.join(DATASET_PATH, "train")
-  TEST_PATH  = os.path.join(DATASET_PATH, "test")
+  # TRAIN_PATH = os.path.join(DATASET_PATH, "train")
+  # TEST_PATH  = os.path.join(DATASET_PATH, "test")
 
-  TRAIN_LENGTH = len(os.listdir(TRAIN_PATH))
+  TRAIN_LENGTH = 34 #len(os.listdir(TRAIN_PATH))
   BATCH_SIZE = 64
   BUFFER_SIZE = 1000
   STEPS_PER_EPOCH = 1#TRAIN_LENGTH // BATCH_SIZE #  will be 0, is this an issue?
 
-  train_data = segloader.load_segmentation(TRAIN_PATH)
+  # train_data = segloader.load_segmentation(TRAIN_PATH)
 
-  test_data = segloader.load_segmentation(TEST_PATH)
+  # test_data = segloader.load_segmentation(TEST_PATH)
+
+  train_data, test_data = ganondorf.data.Dataset.load("ALSegmentation",
+                                                      size=(128,128))
 
   train = train_data.map(load_image_train,
                             num_parallel_calls=tf.data.experimental.AUTOTUNE)
@@ -135,7 +148,7 @@ if __name__ == '__main__':
 
   test = test_data.map(load_image_test)
 
-  train_dataset = train.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+  train_dataset = train.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
   train_dataset = train_dataset.prefetch(
       buffer_size=tf.data.experimental.AUTOTUNE
       )
@@ -143,7 +156,10 @@ if __name__ == '__main__':
 
   test_dataset = test.batch(BATCH_SIZE)
 
-  simage, smask  = next(iter(test.take(1)))
+  # Test 1 works too nicly so uses test 2
+  it = iter(test.take(2))
+  next(it)
+  simage, smask  = next(it)
 
   OUTPUT_CHANNELS = 2
 
@@ -151,11 +167,11 @@ if __name__ == '__main__':
                                                  include_top=False)
 
   layer_names = [
-      'block_1_expand_relu',  #  64x64
-      'block_3_expand_relu',  #  32x32
-      'block_6_expand_relu',  #  16x16
-      'block_13_expand_relu', #  8x8
-      'block_16_project',     #  4x4
+      'block_1_expand_relu',  #  64x64x96
+      'block_3_expand_relu',  #  32x32x144
+      'block_6_expand_relu',  #  16x16x192
+      'block_13_expand_relu', #  8x8x576
+      'block_16_project',     #  4x4x320
       ]
 
   base_model_outputs = \
@@ -166,55 +182,54 @@ if __name__ == '__main__':
 
   down_stack.trainable = False
 
-  up_stack = [
-      pix2pix.upsample(512, 3),
-      pix2pix.upsample(256, 3),
-      pix2pix.upsample(128, 3),
-      pix2pix.upsample(64, 3),
+  residual_stack = [
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
+      tf.keras.layers.ReLU(),
       ]
-#-------------------------------------
-
-
-  # residual_stack = [
-  #     residual.ResidualBottleneckLayer.as_residual_bridge(128),
-  #     residual.ResidualBottleneckLayer.as_residual_bridge(128),
-  #     residual.ResidualBottleneckLayer.as_residual_bridge(128),
-  #     ]
 
   # after_residual_activation = tf.keras.layers.ReLU()
 
-  # decoder_stack = [
-  #     decoder_block_3D(128, name="decode_block_1"),  # (bs,  6,  8,  8, 128)
-  #     decoder_block_3D(64,  name="decode_block_2"),  # (bs, 12, 16, 16, 64)
-  #     decoder_block_3D(32,  name="decode_block_3"),  # (bs, 24, 32, 32, 32)
+
+  #Old Version
+  # up_stack = [
+  #     pix2pix.upsample(512, 3),
+  #     pix2pix.upsample(256, 3),
+  #     pix2pix.upsample(128, 3),
+  #     pix2pix.upsample(64, 3),
   #     ]
 
+  up_stack = [
+      blocks.decoder_block_2D(512, name="decode_block_1"),
+      blocks.decoder_block_2D(256, name="decode_block_2"),
+      blocks.decoder_block_2D(128, name="decode_block_3"),
+      blocks.decoder_block_2D(64,  name="decode_block_4"),
+      ]
 
 
-#-------------------------------------
+  model = unet_model(OUTPUT_CHANNELS,
+                     down_stack, up_stack, res_stack=residual_stack)
 
-
-
-  model = unet_model(OUTPUT_CHANNELS, down_stack, up_stack)
   model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(
                     from_logits=True
                     ),
                 metrics=['accuracy'])
 
-  # tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file="plot.svg")
+  tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file="plot.svg")
 
   show_predictions(model, simage=simage, smask=smask)
 
 
-  EPOCHS = 12 # 25 #15 #  12 looks best maybe 12.5 10 is consistantly best #20
+  EPOCHS = 78
   VAL_SUBSPLITS = 5
   VALIDATION_STEPS = 1#len(os.listdir(TEST_PATH)) // BATCH_SIZE // VAL_SUBSPLITS
 
   model_history = model.fit(train_dataset.map(add_sample_weights),
                             epochs=EPOCHS,
-                            steps_per_epoch=STEPS_PER_EPOCH,
-                            validation_steps=VALIDATION_STEPS,
+                            #steps_per_epoch=STEPS_PER_EPOCH,
+                            #validation_steps=VALIDATION_STEPS,
                             validation_data=test_dataset,
                             callbacks=[DisplayCallback()])
 

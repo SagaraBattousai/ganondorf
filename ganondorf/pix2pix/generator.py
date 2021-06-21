@@ -2,7 +2,7 @@
 """
 import tensorflow as tf
 from . import residual
-from .blocks import encoder_block_3D, decoder_block_3D, ConvMed
+from .blocks import encoder_block_3D, decoder_block_3D, Feature3D
 
 def Generator(): # pylint: disable=C0103
   OUTPUT_CHANNELS = 1 # pylint: disable=C0103
@@ -22,9 +22,9 @@ def Generator(): # pylint: disable=C0103
       ]
 
   residual_stack = [
-      residual.ResidualBottleneckLayer.as_residual_bridge(128),
-      residual.ResidualBottleneckLayer.as_residual_bridge(128),
-      residual.ResidualBottleneckLayer.as_residual_bridge(128),
+      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
+      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
+      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
       ]
 
   after_residual_activation = tf.keras.layers.ReLU()
@@ -37,7 +37,7 @@ def Generator(): # pylint: disable=C0103
 
 
   initializer = tf.random_normal_initializer(0., 0.02)
-  last = ConvMed(filters=OUTPUT_CHANNELS,
+  last = Feature3D(filters=OUTPUT_CHANNELS,
                  strides=1,
                  kernel_initializer=initializer,
                  activation="tanh")  # (bs, 24, 32, 32, 1)

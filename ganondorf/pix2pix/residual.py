@@ -2,11 +2,11 @@
 
 """
 
-from typing import Tuple, Union, ClassVar
+from typing import Union, ClassVar
 import functools
 import tensorflow as tf
 
-Conv3DSpec = Union[int, Tuple[int, int, int]]
+ConvSpec = Union[int, tuple[int, ...]]
 
 class ResidualBottleneckLayer(tf.keras.Model):
   """ Class for Residual BottleneckLayer
@@ -16,11 +16,25 @@ class ResidualBottleneckLayer(tf.keras.Model):
   DOWN_FILTER_SCALE: ClassVar[int] = 4
   _NAME_ACC = 0
 
+
   def __init__(self,
-               filters: Conv3DSpec,
-               kernel_size: Conv3DSpec = (3, 3, 3),
-               strides: Conv3DSpec = (1, 1, 1),
+               dimensions: int,
+               filters: ConvSpec,
+               kernel_size: ConvSpec = 3, #(3, 3, 3),
+               strides: ConvSpec = 1, #(1, 1, 1),
                name: str = None):
+  
+    self.feature_layer = None
+
+    if dimensions == 1:
+      self.feature_layer = tf.keras.layers.Conv1D
+    elif dimensions == 2:
+      self.feature_layer = tf.keras.layers.Conv2D
+    elif dimensions == 3:
+      self.feature_layer = tf.keras.layers.Conv3D
+    else:
+      raise ValueError("'dimensions' must be either 1, 2 or 3 but was"
+                       f"{dimensions}")
 
     if name is None:
       ResidualBottleneckLayer._NAME_ACC += 1
@@ -29,7 +43,6 @@ class ResidualBottleneckLayer(tf.keras.Model):
     super().__init__(name=name)
     self._filter1, self._filter2, self._filter3 = [filters] * 3 \
         if isinstance(filters, int) else filters
-        #TODO set indent if else is below if
 
     self._kernel_size = [kernel_size] * 3 \
         if isinstance(kernel_size, int) else kernel_size
@@ -40,26 +53,26 @@ class ResidualBottleneckLayer(tf.keras.Model):
     # Feature Down Convolution
     self.down_norm = tf.keras.layers.BatchNormalization()
     self.down_act  = tf.keras.layers.ReLU()
-    self.down_conv = tf.keras.layers.Conv3D(filters=self._filter1,
-                                            kernel_size=1,
-                                            strides=strides,
-                                            padding="valid")
+    self.down_conv = self.feature_layer(filters=self._filter1,
+                                        kernel_size=1,
+                                        strides=strides,
+                                        padding="valid")
 
     # kernel_size Convolution
     self.norm = tf.keras.layers.BatchNormalization()
     self.act  = tf.keras.layers.ReLU()
-    self.conv = tf.keras.layers.Conv3D(filters=self._filter2,
-                                       kernel_size=kernel_size,
-                                       strides=1,
-                                       padding="same")
+    self.conv = self.feature_layer(filters=self._filter2,
+                                   kernel_size=kernel_size,
+                                   strides=1,
+                                   padding="same")
 
     # Feature Up Convolution
     self.up_norm = tf.keras.layers.BatchNormalization()
     self.up_act  = tf.keras.layers.ReLU()
-    self.up_conv = tf.keras.layers.Conv3D(filters=self._filter3,
-                                          kernel_size=1,
-                                          strides=1,
-                                          padding="valid")
+    self.up_conv = self.feature_layer(filters=self._filter3,
+                                      kernel_size=1,
+                                      strides=1,
+                                      padding="valid")
 
 
   #TODO add insert code for first def after __init__
@@ -92,7 +105,9 @@ class ResidualBottleneckLayer(tf.keras.Model):
 
   #TODO: fix indenting for this too
   @classmethod
-  def as_residual_bridge(cls, shape: Union[int, Tuple[int, int]]):
+  def as_residual_bridge(cls,
+                         dimensions: int,
+                         shape: Union[int, tuple[int, int]]):
     """ Doc String
 
     input -> [(input_shape -> 1/4) -> (1/4 -> 1/4) -> [1/4 -> output_shape)]
@@ -102,7 +117,7 @@ class ResidualBottleneckLayer(tf.keras.Model):
     scale = out_shape // cls.DOWN_FILTER_SCALE
     filters = [scale, scale, out_shape]
 
-    return cls(filters, kernel_size=(3, 3, 3), strides=(1,1,1))
+    return cls(dimensions=dimensions, filters=filters, kernel_size=3, strides=1)
 
   @staticmethod
   def _tuple_reducer(acc, elem) -> str:
