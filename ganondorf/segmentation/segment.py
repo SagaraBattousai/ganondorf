@@ -39,25 +39,27 @@ def load_image_test(image, mask):
   return input_image, mask
   
 def unet_model(output_channels, down_stack, up_stack, residual_stack=None):
-  inputs = tf.keras.layers.Input(shape=[128,128,3])
+  inputs = tf.keras.layers.Input(shape=[*IMAGE_SHAPE,3])
 
   skips = down_stack(inputs)
   x = skips[-1]
-  skips = reversed(skips[:-1])
+  skips = reversed(skips)
 
   if residual_stack is not None:
     for res in residual_stack:
       x = res(x)
 
   for up, skip in zip(up_stack, skips):
-    x = up(x)
     concat = tf.keras.layers.Concatenate()
     x = concat([x, skip])
+    x = up(x)
 
-  last = tf.keras.layers.Conv2DTranspose(output_channels,
-                                         3,
-                                         strides=2,
-                                         padding='same')
+  last = tf.keras.layers.Conv2D(output_channels,
+                                3,
+                                strides=1,
+                                padding='same',
+                                activation="tanh")
+  # x = pen(x)
   x = last(x)
 
   return tf.keras.Model(inputs=inputs, outputs=x)
@@ -86,13 +88,13 @@ if __name__ == '__main__':
   IMAGE_SHAPE = (128, 128)
 
   TRAIN_LENGTH = 34
-  BATCH_SIZE = 64
-  BUFFER_SIZE = 1000
+  BATCH_SIZE = 8
+  BUFFER_SIZE = 16 #1000
   STEPS_PER_EPOCH = 1
   VAL_SUBSPLITS = 5
   VALIDATION_STEPS = 1
 
-  train_dataset, test_dataset = ganondorf.data.Dataset.load("ALSegmentation",
+  train_dataset, test_dataset = ganondorf.data.Dataset.load("ALRing", #"ALSegmentation",
                                                             size=IMAGE_SHAPE)
   train_dataset = train_dataset.map(load_image_train,
                                     num_parallel_calls=tf.data.AUTOTUNE)
@@ -101,12 +103,10 @@ if __name__ == '__main__':
 
   train_dataset = train_dataset.cache() \
                                .shuffle(BUFFER_SIZE) \
-                               .batch(BATCH_SIZE)#.repeat()
+                               .batch(BATCH_SIZE).repeat()
   train_dataset = train_dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
-  example_image, example_mask  = next(
-      iter(test_dataset.take(6).skip(5))
-      )
+  example_image, example_mask  = next(iter(test_dataset))
 
   test_dataset = test_dataset.batch(BATCH_SIZE)
 
@@ -118,7 +118,8 @@ if __name__ == '__main__':
       'block_3_expand_relu',  #  32x32x144
       'block_6_expand_relu',  #  16x16x192
       'block_13_expand_relu', #  8x8x576
-      'block_16_project',     #  4x4x320
+      # 'block_16_project',     #  4x4x320
+      'Conv_1', # 4x4x1280
       ]
 
   base_model_outputs = \
@@ -130,17 +131,18 @@ if __name__ == '__main__':
   down_stack.trainable = False
 
   residual_stack = [
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 320),
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
+      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
       tf.keras.layers.ReLU(),
       ]
   
   up_stack = [
-      blocks.decoder_block_2D(512, name="decode_block_1"),
-      blocks.decoder_block_2D(256, name="decode_block_2"),
-      blocks.decoder_block_2D(128, name="decode_block_3"),
-      blocks.decoder_block_2D(64,  name="decode_block_4"),
+      blocks.decoder_block_2D(1280, name="decode_block_1"), #512
+      blocks.decoder_block_2D(576, name="decode_block_2"), #256
+      blocks.decoder_block_2D(192, name="decode_block_3"), #128
+      blocks.decoder_block_2D(144,  name="decode_block_4"), #64
+      blocks.decoder_block_2D(96,  name="decode_block_5"), #64
       ]
 
 
@@ -155,20 +157,12 @@ if __name__ == '__main__':
 
   tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file="plot.svg")
 
-  ganondorf.data.Visualizer.show_image_predictions(
-      model,
-      dataset=(example_image, example_mask),
-      format_prediction=create_mask
-      )
+  ring_sample_weights = ganondorf.data.Dataset.get_sample_weights_func([3.075, 1])
 
-
-  # 1.33 looks awesome i think 1.25 too
-  add_sample_weights = ganondorf.data.Dataset.get_sample_weights_func([3, 1])
-
-  model_history = model.fit(train_dataset.map(add_sample_weights),
+  model_history = model.fit(train_dataset.map(ring_sample_weights),
                             epochs=EPOCHS,
-                            #steps_per_epoch=STEPS_PER_EPOCH,
-                            #validation_steps=VALIDATION_STEPS,
+                            steps_per_epoch=STEPS_PER_EPOCH,
+                            validation_steps=VALIDATION_STEPS,
                             validation_data=test_dataset,
                             callbacks=[DisplayCallback()])
 
@@ -191,6 +185,23 @@ if __name__ == '__main__':
   plt.ylim([0, 1])
   plt.legend()
   plt.show()
+
+  val_loss_arr = np.array(val_loss)
+  val_acc_arr = np.array(model_history.history['val_accuracy'])
+  
+  val_acc_best_index = np.argmax(val_acc_arr)
+  val_loss_best_index = np.argmin(val_loss_arr)
+  
+  print("Highest Accuracy Epoch:", val_acc_best_index + 1,
+        "Lowest Loss Epoch:", val_loss_best_index + 1)
+  
+  print("Highest Accuracy:", val_acc_arr[val_acc_best_index],
+        "Lowest Loss:", val_loss_arr[val_loss_best_index])
+
+  if val_loss_best_index != val_acc_best_index:
+    print("Loss and acc not at same location")
+    print("Loss Accuracy:", val_acc_arr[val_loss_best_index],
+          "Accuracy Loss:", val_loss_arr[val_acc_best_index])
 
   if len(sys.argv) < 2 or sys.argv[1].lower() != "nosave":
     # model.save("chkpt/")

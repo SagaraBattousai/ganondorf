@@ -111,10 +111,11 @@ def load_npz_dataset(path:str, label_index:int=-1)->tf.data.Dataset:
 
   return tf.data.Dataset.from_tensor_slices(dataset)
 
-def load_AL_segmentation(load_train = True,
-                         load_test = True,
-                         size:tuple[int, int]=None)->tf.data.Dataset:
-  path = "ALSegment"
+
+def load_segmentation_dataset(path:str,
+                              load_train = True,
+                              load_test = True,
+                              size:tuple[int, int]=None)->tf.data.Dataset:
   dataset = []
 
   if load_train:
@@ -134,6 +135,21 @@ def load_AL_segmentation(load_train = True,
   else:
     return tuple(dataset)
 
+
+def load_AL_segmentation(load_train = True,
+                         load_test = True,
+                         size:tuple[int, int]=None)->tf.data.Dataset:
+  path = "ALSegment"
+  return load_segmentation_dataset(path, load_train, load_test, size)
+
+
+def load_AL_ring(load_train = True,
+                 load_test = True,
+                 size:tuple[int, int]=None)->tf.data.Dataset:
+  path = "ALRing"
+  return load_segmentation_dataset(path, load_train, load_test, size)
+
+
 def load_brain_tumor_progression(load_pre_scan=True,
                                  load_post_scan=True,
                                  load_pre_mask=True,
@@ -150,7 +166,7 @@ def load_brain_tumor_progression(load_pre_scan=True,
   if load_post_scan:
     dataset.append(load_medical_dataset(path, 
                                         data_prefix="Post_Scan_T1.nii.gz"))
-  
+
   if load_pre_mask:
     dataset.append(load_medical_dataset(path, 
                                         data_prefix="Pre_Mask.nii.gz"))

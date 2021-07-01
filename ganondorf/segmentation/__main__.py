@@ -56,6 +56,13 @@ if __name__ == '__main__':
     predict = create_mask(model.predict(arr))
     plt.imshow(predict)
     plt.show()
+    #----------------------------------------
+    predict = predict.numpy()
+    predict = predict.astype(np.uint8)
+    predict = predict.reshape(predict.shape[0], predict.shape[1])
+    output = PIL.Image.fromarray(predict * 255)
+    output = output.convert('1')
+    output.save('prediction.png')
 
 
 

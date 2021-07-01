@@ -38,8 +38,7 @@ class Visualizer():
       model:tf.keras.Model,
       dataset:Datapoint=None,
       num:int=1,
-      #Leave as Any-> Any for now but may change to arr
-      format_prediction:Callable[Any, Any]= identity
+      format_prediction:Callable[np.array, np.array]=identity
       )->None:
 
     if isinstance(dataset, tf.data.Dataset):
