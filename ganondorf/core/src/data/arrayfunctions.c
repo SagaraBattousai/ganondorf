@@ -31,7 +31,6 @@ PyObject *sum_array(PyObject *arr, int rtype)
   }
 }
 
-
 PyObject *map_array(PyObject *arr, mappable_function func, ...)
 {
   NpyIter *iter;
@@ -92,6 +91,111 @@ PyObject *map_array(PyObject *arr, mappable_function func, ...)
 
   return arr;
 }
+
+
+npy_intp PyArray_CountNonzero(PyArrayObject *self)
+{
+  /* Nonzero boolean function */
+  PyArray_NonzeroFunc *nonzero = PyArray_DESCR(self)->f->nonzero;
+
+  NpyIter *iter;
+  NpyIter_IterNextFunc *iternext;
+  char **dataptr;
+  npy_intp nonzero_count;
+  npy_intp *strideptr, *innersizeptr;
+
+  /* Handle zero-sized arrays specially */
+  if (PyArray_SIZE(self) == 0) {
+    return 0;
+  }
+
+  /*
+   * Create and use an iterator to count the nonzeros.
+   *   flag NPY_ITER_READONLY
+   *     - The array is never written to.
+   *   flag NPY_ITER_EXTERNAL_LOOP
+   *     - Inner loop is done outside the iterator for efficiency.
+   *   flag NPY_ITER_NPY_ITER_REFS_OK
+   *     - Reference types are acceptable.
+   *   order NPY_KEEPORDER
+   *     - Visit elements in memory order, regardless of strides.
+   *       This is good for performance when the specific order
+   *       elements are visited is unimportant.
+   *   casting NPY_NO_CASTING
+   *     - No casting is required for this operation.
+   */
+  iter = NpyIter_New(self, NPY_ITER_READONLY |
+    NPY_ITER_EXTERNAL_LOOP |
+    NPY_ITER_REFS_OK,
+    NPY_KEEPORDER, NPY_NO_CASTING,
+    NULL);
+  if (iter == NULL) {
+    return -1;
+  }
+
+  /*
+   * The iternext function gets stored in a local variable
+   * so it can be called repeatedly in an efficient manner.
+   */
+  iternext = NpyIter_GetIterNext(iter, NULL);
+  if (iternext == NULL) {
+    NpyIter_Deallocate(iter);
+    return -1;
+  }
+  /* The location of the data pointer which the iterator may update */
+  dataptr = NpyIter_GetDataPtrArray(iter);
+  /* The location of the stride which the iterator may update */
+  strideptr = NpyIter_GetInnerStrideArray(iter);
+  /* The location of the inner loop size which the iterator may update */
+  innersizeptr = NpyIter_GetInnerLoopSizePtr(iter);
+
+  nonzero_count = 0;
+  do {
+    /* Get the inner loop data/stride/count values */
+    char *data = *dataptr;
+    npy_intp stride = *strideptr;
+    npy_intp count = *innersizeptr;
+
+    /* This is a typical inner loop for NPY_ITER_EXTERNAL_LOOP */
+    while (count--) {
+      if (nonzero(data, self)) {
+        ++nonzero_count;
+      }
+      data += stride;
+    }
+
+    /* Increment the iterator to the next inner loop */
+  } while (iternext(iter));
+
+  NpyIter_Deallocate(iter);
+
+  return nonzero_count;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*

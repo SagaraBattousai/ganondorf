@@ -5,7 +5,7 @@ from typing import ClassVar, Callable, Union, TypeVar, Mapping, Sequence
 
 import numpy as np
 import tensorflow as tf
-import ganondorf.core.datacore as datacore
+#import ganondorf.core.datacore as datacore
 import ganondorf.data.dataset_loader as dl
 
 T = TypeVar("T")
@@ -15,7 +15,7 @@ DatasetLoaderFunc = Callable[..., LoadedDataset]
 def placeholder(*args, **kwargs):
   return (0,)
 
-class Dataset(datacore.Dataset):
+class Dataset(): #datacore.Dataset):
 
   _DATASET_LOADER_MAP: ClassVar[dict[str, DatasetLoaderFunc]] = \
       {# "arcm"
@@ -34,6 +34,8 @@ class Dataset(datacore.Dataset):
        "alsegmentation": dl.load_AL_segmentation,
        # "ALRing"
        "alring": dl.load_AL_ring,
+       # "ALGeneration"
+       "algeneration": dl.load_AL_generation,                 
        }
 
   @staticmethod

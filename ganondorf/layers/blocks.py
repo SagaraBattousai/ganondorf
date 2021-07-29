@@ -7,6 +7,10 @@ import functools
 import tensorflow as tf
 import tensorflow_addons as tfa
 
+__all__ = ['Feature2D', 'Feature3D', 'Decode2D', 'Decode3D', 'InstNormalize',
+           'encoder_block', 'encoder_block_3D', 'encoder_block_2D',
+           'decoder_block', 'decoder_block_3D', 'decoder_block_2D']
+
 
 Feature3D = functools.partial(tf.keras.layers.Conv3D,
                               kernel_size=(3,3,3),

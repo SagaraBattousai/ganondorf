@@ -9,10 +9,7 @@
 
 #define DATA_MODULE
 #include <datacore.h>
-#include <datasettype.h>
 #include <arrayfunctions.h>
-
-extern PyTypeObject PyDataset_Type;
 
 void sub(int *value, va_list args)
 {
@@ -26,7 +23,6 @@ void mult(int *value, va_list args)
   double val = *value;
   *value = floor(val * multiplier);
 }
-
 
 static PyObject *datacore_window_level(PyObject *self, PyObject *args)
 {
@@ -56,17 +52,10 @@ static PyObject *datacore_window_level(PyObject *self, PyObject *args)
   return image;
 }
 
-
-
-
-
-
 static PyMethodDef datacore_methods[] = {
   {"window_level", (PyCFunction)datacore_window_level, METH_VARARGS, "doc string"},
   {NULL} // Sentinel
 };
-
-
 
 static PyModuleDef datacore = {
   PyModuleDef_HEAD_INIT,
@@ -79,13 +68,7 @@ static PyModuleDef datacore = {
 PyMODINIT_FUNC
 PyInit_datacore(void)
 {
-  PyObject *module;
-  if (PyType_Ready(&PyDataset_Type) < 0)
-  {
-    return NULL;
-  }
-
-  module = PyModule_Create(&datacore);
+  PyObject *module = PyModule_Create(&datacore);
   if (module == NULL)
   {
     return NULL;
@@ -94,70 +77,6 @@ PyInit_datacore(void)
   import_array();
   //import_umath();
 
-  Py_INCREF(&PyDataset_Type);
-  if (PyModule_AddObject(module, "Dataset", (PyObject *)&PyDataset_Type) < 0)
-  {
-    Py_DECREF(&PyDataset_Type);
-    Py_DECREF(module);
-    return NULL;
-  }
-
   return module;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-static PyObject* ganondorf_add(PyObject *self, PyObject *args)
-{
-  const int a;
-  const int b;
-
-  if (!PyArg_ParseTuple(args, "ii", &a, &b))
-  {
-    return NULL;
-  }
-
-  int c = a + b;
-
-  return PyLong_FromLong(c);
-
-}
-
-
-static PyMethodDef GanondorfMethods[] = {
-  {"gadd", ganondorf_add, METH_VARARGS, "adds"},
-
-
-  {NULL, NULL, 0, NULL}
-};
-
-static struct PyModuleDef ganondorfmodule = {
-  PyModuleDef_HEAD_INIT,
-  "gdc",
-  NULL, //Documentation
-  -1,
-  GanondorfMethods
-};
-
-PyMODINIT_FUNC PyInit_ganondorf_core(void)
-{
-  return PyModule_Create(&ganondorfmodule);
-}
-
-
-
-*/

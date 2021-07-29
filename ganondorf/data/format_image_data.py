@@ -1,4 +1,4 @@
-""" Module for Formating images to use with the machine learning packages
+""" Module for Formating images to use with the machine learning module
 
 """
 import PIL
@@ -8,6 +8,13 @@ import os
 from typing import Sequence
 import tensorflow as tf
 from ganondorf.core import datacore
+
+__all__ = ['window_level', 'image_as_array', 'medical_as_array', 'as_mask',
+           'split_into_patches', 'sew_patches', 'resize_nii',
+           'convert_dir_images_to_nii', 'resize_medical_image', 'resize_image',
+           'fix_aspect_ratio' , 'fix_med_aspect_ratio', 'resize_image_and_save',
+           'fix_aspect_ratio_and_save', 'normalize', 'square_images',
+           'save_image_array', 'square_pad', 'load_image_array']
 
 def window_level(hound_image: np.array, window: int, level:int) -> np.array:
 
@@ -300,5 +307,11 @@ def square_images(filenames: Sequence[str],
     outname = fname if out_filenames is None else out_filenames[i]
 
     img.save(outname)
+
+
+@tf.function
+def normalize(tensor_image):
+  return tf.cast(tensor_image, tf.float32) / 255.0
+
 
 

@@ -15,19 +15,22 @@ add_library(datacore
 if (PYTHON_EXTENSION)
   message(STATUS "Setting library extension to ${PYTHON_EXTENSION}")
 
-  set_target_properties(datacore PROPERTIES SUFFIX ${PYTHON_EXTENSION})
+  set_target_properties(datacore 
+    PROPERTIES 
+    SUFFIX ${PYTHON_EXTENSION}
+    PREFIX "")
 endif()
 
 target_include_directories(datacore 
   PUBLIC 
-  ${Python_INCLUDE_DIRS}
-  ${Python_NumPy_INCLUDE_DIRS}
+  ${Python3_INCLUDE_DIRS}
+  ${Python3_NumPy_INCLUDE_DIRS}
   ${PUBLIC_HEADDER_DIRS})
 
 target_compile_definitions(datacore PUBLIC 
   MODULE_ARRAY_API_NAME=datacore_ARRAY_API)
 
-target_link_libraries(datacore ${Python_LIBRARIES})
+target_link_libraries(datacore ${Python3_LIBRARIES})
 
 #find_package(SimpleITK)
 #add_executable(sitk_example sitk_example.cpp)

@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 
 import ganondorf.data
 
-
-
 @tf.function
 def normalize(tensor_image):
   return tf.cast(tensor_image, tf.float32) / 255.0

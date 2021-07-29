@@ -6,6 +6,8 @@ from typing import Union, ClassVar
 import functools
 import tensorflow as tf
 
+__all__ = ['ResidualBottleneckLayer']
+
 ConvSpec = Union[int, tuple[int, ...]]
 
 class ResidualBottleneckLayer(tf.keras.Model):

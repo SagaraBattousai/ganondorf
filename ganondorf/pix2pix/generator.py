@@ -1,8 +1,8 @@
 """ DOC STRING FOR pix2pix Generator Module
 """
 import tensorflow as tf
-from . import residual
-from .blocks import encoder_block_3D, decoder_block_3D, Feature3D
+from ganondorf.layers import ResidualBottleneckLayer
+from ganondorf.layers import encoder_block_3D, decoder_block_3D, Feature3D
 
 def Generator(): # pylint: disable=C0103
   OUTPUT_CHANNELS = 1 # pylint: disable=C0103
@@ -22,9 +22,9 @@ def Generator(): # pylint: disable=C0103
       ]
 
   residual_stack = [
-      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
-      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
-      residual.ResidualBottleneckLayer.as_residual_bridge(3, 128),
+      ResidualBottleneckLayer.as_residual_bridge(3, 128),
+      ResidualBottleneckLayer.as_residual_bridge(3, 128),
+      ResidualBottleneckLayer.as_residual_bridge(3, 128),
       ]
 
   after_residual_activation = tf.keras.layers.ReLU()

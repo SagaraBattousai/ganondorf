@@ -3,9 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import ganondorf.data
-from ganondorf.pix2pix import residual
-from ganondorf.pix2pix import blocks
+import ganondorf as gd
 
 example_image = None
 example_mask = None
@@ -17,11 +15,6 @@ example_mask = None
 #   for i in range(height):
 #     for j in range(width):
 
-
-@tf.function
-def normalize(tensor_image):
-  return tf.cast(tensor_image, tf.float32) / 255.0
-
 @tf.function
 def load_image_train(image, mask):
 
@@ -29,40 +22,14 @@ def load_image_train(image, mask):
     image = tf.image.flip_left_right(image)
     mask  = tf.image.flip_left_right(mask)
 
-  image = normalize(image)
+  image = gd.data.normalize(image)
 
   return image, mask
 
 @tf.function
 def load_image_test(image, mask):
-  input_image = normalize(image)
+  input_image = gd.data.normalize(image)
   return input_image, mask
-  
-def unet_model(output_channels, down_stack, up_stack, residual_stack=None):
-  inputs = tf.keras.layers.Input(shape=[*IMAGE_SHAPE,3])
-
-  skips = down_stack(inputs)
-  x = skips[-1]
-  skips = reversed(skips)
-
-  if residual_stack is not None:
-    for res in residual_stack:
-      x = res(x)
-
-  for up, skip in zip(up_stack, skips):
-    concat = tf.keras.layers.Concatenate()
-    x = concat([x, skip])
-    x = up(x)
-
-  last = tf.keras.layers.Conv2D(output_channels,
-                                3,
-                                strides=1,
-                                padding='same',
-                                activation="tanh")
-  # x = pen(x)
-  x = last(x)
-
-  return tf.keras.Model(inputs=inputs, outputs=x)
 
 @tf.function
 def create_mask(pred_mask):
@@ -72,14 +39,42 @@ def create_mask(pred_mask):
 
 class DisplayCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs=None):
-    #clear_output(wait=True)
     if (epoch + 1) % 10 == 0:
-      ganondorf.data.Visualizer.show_image_predictions(
+      gd.data.Visualizer.show_image_predictions(
           self.model,
           dataset=(example_image, example_mask),
           format_prediction=create_mask
           )
     print('\nSample Predictions after epoch {}\n'.format(epoch+1))
+
+
+
+class DisplayCallback(tf.keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs=None):
+    if (epoch + 1) % 10 == 0:
+      gd.data.Visualizer.show_image_predictions(
+          self.model,
+          dataset=(example_image, example_mask),
+          format_prediction=create_mask
+          )
+    print('\nSample Predictions after epoch {}\n'.format(epoch+1))
+
+
+class SaverCallback(tf.keras.callbacks.Callback):
+  def __init__(self):
+    super().__init__()
+    self.best_accuracy = -1
+    self.lowest_loss = 100
+
+  def on_epoch_end(self, epoch, logs): #logs can't be empty
+    if (epoch + 1) > 59:
+      if logs['val_loss'] < self.lowest_loss:
+        self.model.save("./ring_segmentation_checkpoint/lowest_loss")
+        self.lowest_loss = logs['val_loss']
+
+      if logs['val_accuracy'] > self.best_accuracy:
+        self.model.save("./ring_segmentation_checkpoint/best_accuracy")
+        self.best_accuracy = logs['val_accuracy']
 
 
 if __name__ == '__main__':
@@ -94,8 +89,8 @@ if __name__ == '__main__':
   VAL_SUBSPLITS = 5
   VALIDATION_STEPS = 1
 
-  train_dataset, test_dataset = ganondorf.data.Dataset.load("ALRing", #"ALSegmentation",
-                                                            size=IMAGE_SHAPE)
+  train_dataset, test_dataset = gd.data.Dataset.load("ALRing", #"ALSegmentation",
+                                                     size=IMAGE_SHAPE)
   train_dataset = train_dataset.map(load_image_train,
                                     num_parallel_calls=tf.data.AUTOTUNE)
 
@@ -131,23 +126,27 @@ if __name__ == '__main__':
   down_stack.trainable = False
 
   residual_stack = [
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
-      residual.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
+      gd.layers.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
+      gd.layers.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
+      gd.layers.ResidualBottleneckLayer.as_residual_bridge(2, 1280), # 320),
       tf.keras.layers.ReLU(),
       ]
-  
+
   up_stack = [
-      blocks.decoder_block_2D(1280, name="decode_block_1"), #512
-      blocks.decoder_block_2D(576, name="decode_block_2"), #256
-      blocks.decoder_block_2D(192, name="decode_block_3"), #128
-      blocks.decoder_block_2D(144,  name="decode_block_4"), #64
-      blocks.decoder_block_2D(96,  name="decode_block_5"), #64
+      gd.layers.decoder_block_2D(1280, name="decode_block_1"), #512
+      gd.layers.decoder_block_2D(576, name="decode_block_2"), #256
+      gd.layers.decoder_block_2D(192, name="decode_block_3"), #128
+      gd.layers.decoder_block_2D(144,  name="decode_block_4"), #64
+      gd.layers.decoder_block_2D(96,  name="decode_block_5"), #64
       ]
 
 
-  model = unet_model(OUTPUT_CHANNELS,
-                     down_stack, up_stack, residual_stack=residual_stack)
+  model_input = tf.keras.layers.Input(shape=[*IMAGE_SHAPE, 3])
+
+  model = gd.models.unet_model(OUTPUT_CHANNELS,
+                               down_stack, up_stack,
+                               inputs=model_input,
+                               residual_stack=residual_stack)
 
   model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(
@@ -157,17 +156,17 @@ if __name__ == '__main__':
 
   tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file="plot.svg")
 
-  ring_sample_weights = ganondorf.data.Dataset.get_sample_weights_func([3.075, 1])
+  ring_sample_weights = gd.data.Dataset.get_sample_weights_func([3.075, 1])
 
   model_history = model.fit(train_dataset.map(ring_sample_weights),
                             epochs=EPOCHS,
                             steps_per_epoch=STEPS_PER_EPOCH,
                             validation_steps=VALIDATION_STEPS,
                             validation_data=test_dataset,
-                            callbacks=[DisplayCallback()])
+                            callbacks=[SaverCallback()])#DisplayCallback()])
 
 
-  ganondorf.data.Visualizer.show_image_predictions(
+  gd.data.Visualizer.show_image_predictions(
       model,
       dataset=(example_image, example_mask),
       format_prediction=create_mask
@@ -188,13 +187,13 @@ if __name__ == '__main__':
 
   val_loss_arr = np.array(val_loss)
   val_acc_arr = np.array(model_history.history['val_accuracy'])
-  
+
   val_acc_best_index = np.argmax(val_acc_arr)
   val_loss_best_index = np.argmin(val_loss_arr)
-  
+
   print("Highest Accuracy Epoch:", val_acc_best_index + 1,
         "Lowest Loss Epoch:", val_loss_best_index + 1)
-  
+
   print("Highest Accuracy:", val_acc_arr[val_acc_best_index],
         "Lowest Loss:", val_loss_arr[val_loss_best_index])
 
@@ -203,8 +202,11 @@ if __name__ == '__main__':
     print("Loss Accuracy:", val_acc_arr[val_loss_best_index],
           "Accuracy Loss:", val_loss_arr[val_acc_best_index])
 
-  if len(sys.argv) < 2 or sys.argv[1].lower() != "nosave":
-    # model.save("chkpt/")
-    model.save("E{:02}_chkpt/".format(EPOCHS))
+  # if len(sys.argv) < 2 or sys.argv[1].lower() != "nosave":
+  #   checkpoint_dir = './training_checkpoints'
+  #   checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+  #   checkpoint = tf.train.Checkpoint(model)
+  #   # model.save("chkpt/")
+  #   model.save("E{:02}_chkpt/".format(EPOCHS))
 
 

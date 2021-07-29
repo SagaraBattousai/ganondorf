@@ -3,6 +3,7 @@
 # No images
 *.png
 *.jpg
+*.svg
 
 # No Secret Tokens
 .*_token
@@ -18,6 +19,15 @@ ganondorf/data/datasets/*
 #!ganondorf/core/CMakeLists.txt
 #!ganondorf/core/include/
 #!ganondorf/core/src/
+
+# Network Checkpoints
+ganondorf/segmentation/ring_segmentation_checkpoint/
+ganondorf/transfer/E12_chkpt/
+ganondorf/transfer/E250_chkpt/
+ganondorf/transfer/E78_chkpt/
+ganondorf/transfer/E78_chkpt_Without_image_09/
+ganondorf/transfer/fine_chkpt/
+ganondorf/segmentation/ring_intraoperative_segmentation_checkpoint/
 
 
 # Vim Files

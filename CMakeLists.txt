@@ -8,7 +8,9 @@ project(Ganondorf
 
 include(cmake/inplace_build.cmake)
 # Do I need python 3 ???
-find_package(Python COMPONENTS Development NumPy REQUIRED) #Possibly add Interpreter later
+find_package(Python3 COMPONENTS Development NumPy REQUIRED) #Possibly add Interpreter later
+
+message(STATUS ${Python3_NumPy_VERSION})
 
 
 set(BUILD_PYTHON_EXTENSIONS ON CACHE BOOL 

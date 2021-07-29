@@ -2,7 +2,7 @@
 """
 import functools
 import tensorflow as tf
-from .blocks import encoder_block_3D #, InstNormalize
+from ganondorf.layers import encoder_block_3D #, InstNormalize
 
 LeakyReLUMed = functools.partial(tf.keras.layers.LeakyReLU,
                                  alpha=0.2,

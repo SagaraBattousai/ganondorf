@@ -11,7 +11,6 @@ Includes dataset transformations for data of types such as:
 #stdlib imports
 import os
 import importlib.resources as resources
-# import collections
 
 #external imports
 import PIL
@@ -42,12 +41,33 @@ def dir_to_mask(path):
     img = fid.as_mask(img)
     img.save(x)
 
+def load_image_single_dataset(path:str, 
+                              dirname:str="image",
+                              size:tuple[int, int]=None)->tf.data.Dataset:
+
+  dataset_path = resources.files(gdds).joinpath(path)
+
+  image_files = dataset_path.joinpath(dirname).iterdir()
+
+  images = []
+
+  for img in image_files:
+
+    if size is not None:
+      image = fid.image_as_array(fid.resize_image(img, size))
+    else:
+      image = image_as_array(img) # Using path but in zip so not safe? 
+
+    images.append(image)
+  
+  return tf.data.Dataset.from_tensor_slices(images)
+
 def load_image_pair_dataset(path:str, 
                             image_dirname:str="image",
                             label_dirname:str="mask",
                             size:tuple[int, int]=None)->tf.data.Dataset:
 
-  dataset_path = resources.files(gdds).joinpath(path) #.open()
+  dataset_path = resources.files(gdds).joinpath(path)
 
   image_files = dataset_path.joinpath(image_dirname).iterdir()
   label_files = dataset_path.joinpath(label_dirname).iterdir()
@@ -135,6 +155,26 @@ def load_segmentation_dataset(path:str,
   else:
     return tuple(dataset)
 
+def load_generation_dataset(path:str,
+                            load_train = True,
+                            load_test = True,
+                            size:tuple[int, int]=None)->tf.data.Dataset:
+  dataset = []
+
+  if load_train:
+    dataset.append(load_image_single_dataset(path + "/train",
+                                             dirname="image",
+                                             size=size))
+  if load_test:
+    dataset.append(load_image_single_dataset(path + "/test",
+                                             dirname="image",
+                                             size=size))
+  if dataset == []:
+    return None
+  elif len(dataset) == 1:
+    return dataset[0]
+  else:
+    return tuple(dataset)
 
 def load_AL_segmentation(load_train = True,
                          load_test = True,
@@ -148,6 +188,12 @@ def load_AL_ring(load_train = True,
                  size:tuple[int, int]=None)->tf.data.Dataset:
   path = "ALRing"
   return load_segmentation_dataset(path, load_train, load_test, size)
+
+def load_AL_generation(load_train = True,
+                       load_test = True,
+                       size:tuple[int, int]=None)->tf.data.Dataset:
+  path = "ALGeneration"
+  return load_generation_dataset(path, load_train, load_test, size)
 
 
 def load_brain_tumor_progression(load_pre_scan=True,
