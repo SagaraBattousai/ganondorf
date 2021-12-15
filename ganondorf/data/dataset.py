@@ -34,8 +34,12 @@ class Dataset(): #datacore.Dataset):
        "alsegmentation": dl.load_AL_segmentation,
        # "ALRing"
        "alring": dl.load_AL_ring,
+       # "ALRingWithDays345"
+       "alringwithdays345": dl.load_AL_ring_345,
        # "ALGeneration"
        "algeneration": dl.load_AL_generation,                 
+       # "CycleModel"
+       "cyclemodel": dl.load_cycle_model,
        }
 
   @staticmethod

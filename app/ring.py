@@ -24,21 +24,17 @@ def create_mask(pred_mask):
   pred_mask = pred_mask[..., tf.newaxis]
   return pred_mask[0]
 
-def generate_ring(img_name):
+def generate_ring(img_name, network="RingIONetwork"):
   global model
   if model is None:
-    model = tf.keras.models.load_model("RingNetwork")
+    model = tf.keras.models.load_model(network)
 
-  img = PIL.Image.open(img_name).convert('RGB')#.resize((128,128))
+  img = PIL.Image.open(img_name).convert('RGB')
   img = np.asarray(img)
   if img.shape[0] != img.shape[1]:
     img = ganondorf.data.square_pad(img)
   img = PIL.Image.fromarray(img).resize((128,128))
   img = np.asarray(img)
-
-
-
-
 
   arr = (img[np.newaxis,...]).astype(np.float32) / 255.0
 

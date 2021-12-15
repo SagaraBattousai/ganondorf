@@ -1,4 +1,12 @@
 
+# No Checkpoints or Models
+checkpoint
+ckpt-*.index
+ckpt-*.data*
+saved_model.pb
+keras_metadata.pb
+variables.data*
+variables.index
 
 # No images
 *.png
@@ -21,6 +29,7 @@ ganondorf/data/datasets/*
 #!ganondorf/core/src/
 
 # Network Checkpoints
+ganondorf/networks/*
 ganondorf/segmentation/ring_segmentation_checkpoint/
 ganondorf/transfer/E12_chkpt/
 ganondorf/transfer/E250_chkpt/

@@ -6,6 +6,15 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 import ganondorf.data
+@tf.function
+def normalize(tensor_image):
+  return tf.cast(tensor_image, tf.float32) / 255.0
+
+
+@tf.function
+def load_image_test(image, mask):
+  input_image = normalize(image)
+  return input_image, mask
 
 @tf.function
 def normalize(tensor_image):

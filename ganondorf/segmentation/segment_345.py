@@ -8,13 +8,6 @@ import ganondorf as gd
 example_image = None
 example_mask = None
 
-# def nearest_convolve(arr):
-#   out = np.empty_like(arr)
-#   height = arr.shape[0]
-#   width = arr.shape[1]
-#   for i in range(height):
-#     for j in range(width):
-
 @tf.function
 def load_image_train(image, mask):
 
@@ -52,32 +45,35 @@ class SaverCallback(tf.keras.callbacks.Callback):
   def __init__(self):
     super().__init__()
     self.best_accuracy = -1
-    self.lowest_loss = 100
+    # self.lowest_loss = 100
+    self.model_best_acc = None
+    self.epoch_best_acc = 0
 
   def on_epoch_end(self, epoch, logs): #logs can't be empty
-    if (epoch + 1) > 59:
-      if logs['val_loss'] < self.lowest_loss:
-        self.model.save("./ring_segmentation_checkpoint/lowest_loss")
-        self.lowest_loss = logs['val_loss']
-
-      if logs['val_accuracy'] > self.best_accuracy:
-        self.model.save("./ring_segmentation_checkpoint/best_accuracy")
-        self.best_accuracy = logs['val_accuracy']
+    if logs['val_accuracy'] > self.best_accuracy:
+      self.best_accuracy = logs['val_accuracy']
+      self.model_best_acc = self.model
+      self.epoch_best_acc = epoch
+  
+  def on_train_end(self, logs=None):
+    print("Training has ended, best accuracy epoch was:",
+          self.epoch_best_acc + 1, "with accuracy of:", self.best_accuracy)
+    self.model_best_acc.save("./ring_segmentation_checkpoint/best_accuracy")
 
 
 if __name__ == '__main__':
-  EPOCHS = 100
+  EPOCHS = 220 #atm 205 is best
   OUTPUT_CHANNELS = 2
   IMAGE_SHAPE = (128, 128)
 
-  TRAIN_LENGTH = 34
+  TRAIN_LENGTH = 53
   BATCH_SIZE = 8
   BUFFER_SIZE = 16 #1000
   STEPS_PER_EPOCH = 1
   VAL_SUBSPLITS = 5
   VALIDATION_STEPS = 1
 
-  train_dataset, test_dataset = gd.data.Dataset.load("ALRing",
+  train_dataset, test_dataset = gd.data.Dataset.load("ALRingWithDays345",
                                                      size=IMAGE_SHAPE)
   train_dataset = train_dataset.map(load_image_train,
                                     num_parallel_calls=tf.data.AUTOTUNE)
@@ -144,14 +140,14 @@ if __name__ == '__main__':
 
   tf.keras.utils.plot_model(model, show_shapes=True, dpi=64, to_file="plot.svg")
 
-  ring_sample_weights = gd.data.Dataset.get_sample_weights_func([3.075, 1])
+  ring_sample_weights = gd.data.Dataset.get_sample_weights_func([4, 3])#[24, 17])
 
   model_history = model.fit(train_dataset.map(ring_sample_weights),
                             epochs=EPOCHS,
                             steps_per_epoch=STEPS_PER_EPOCH,
                             validation_steps=VALIDATION_STEPS,
                             validation_data=test_dataset,
-                            callbacks=[DisplayCallback()])#SaverCallback()])
+                            callbacks=[SaverCallback()])#DisplayCallback()])
 
 
   gd.data.Visualizer.show_image_predictions(
@@ -185,16 +181,10 @@ if __name__ == '__main__':
   print("Highest Accuracy:", val_acc_arr[val_acc_best_index],
         "Lowest Loss:", val_loss_arr[val_loss_best_index])
 
-  if val_loss_best_index != val_acc_best_index:
-    print("Loss and acc not at same location")
-    print("Loss Accuracy:", val_acc_arr[val_loss_best_index],
-          "Accuracy Loss:", val_loss_arr[val_acc_best_index])
-
-  if len(sys.argv) < 2 or sys.argv[1].lower() != "nosave":
-    checkpoint_dir = './training_checkpoints'
-    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-    checkpoint = tf.train.Checkpoint(model)
-    # model.save("chkpt/")
-    model.save("E{:02}_chkpt/".format(EPOCHS))
+  # if len(sys.argv) < 2 or sys.argv[1].lower() != "nosave":
+  #   checkpoint_dir = './training_checkpoints'
+  #   checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+  #   checkpoint = tf.train.Checkpoint(model)
+  #   model.save("E{:02}_chkpt/".format(EPOCHS))
 
 

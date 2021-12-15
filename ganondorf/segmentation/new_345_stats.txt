@@ -1,0 +1,2 @@
+Highest Accuracy Epoch: 205 Lowest Loss Epoch: 205
+Highest Accuracy: 0.9354934692382812 Lowest Loss: 0.244803786277771

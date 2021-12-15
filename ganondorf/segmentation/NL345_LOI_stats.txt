@@ -1,0 +1,44 @@
+No Weights:
+Highest Accuracy Epoch: 100 Lowest Loss Epoch: 100
+Highest Accuracy: 0.931884765625 Lowest Loss: 0.25097620487213135
+
+Highest Accuracy Epoch: 93 Lowest Loss Epoch: 93
+Highest Accuracy: 0.92938232421875 Lowest Loss: 0.25377118587493896
+
+3.075:1 :
+Highest Accuracy Epoch: 197 Lowest Loss Epoch: 199
+Highest Accuracy: 0.9243927001953125 Lowest Loss: 0.26172661781311035
+
+3:2 :
+Highest Accuracy Epoch: 89 Lowest Loss Epoch: 89
+Highest Accuracy: 0.9300460815429688 Lowest Loss: 0.2546774744987488
+
+ighest Accuracy Epoch: 74 Lowest Loss Epoch: 114
+Highest Accuracy: 0.9290390014648438 Lowest Loss: 0.2577957510948181
+
+Note: Weird OOm on first run 
+
+4: 3: CHOSEN FOR CONSISTANCY!
+Highest Accuracy Epoch: 90 Lowest Loss Epoch: 90
+Highest Accuracy: 0.9301223754882812 Lowest Loss: 0.2555027902126312
+
+Highest Accuracy Epoch: 112 Lowest Loss Epoch: 112
+Highest Accuracy: 0.9299850463867188 Lowest Loss: 0.25200366973876953
+
+Highest Accuracy Epoch: 84 Lowest Loss Epoch: 111
+Highest Accuracy: 0.9298629760742188 Lowest Loss: 0.254101037979126
+
+5:4:
+Highest Accuracy Epoch: 97 Lowest Loss Epoch: 96
+Highest Accuracy: 0.9288558959960938 Lowest Loss: 0.2577318549156189
+
+3 : 4:
+Highest Accuracy Epoch: 104 Lowest Loss Epoch: 104
+Highest Accuracy: 0.9308319091796875 Lowest Loss: 0.24693958461284637
+
+Highest Accuracy Epoch: 106 Lowest Loss Epoch: 106
+Highest Accuracy: 0.9276657104492188 Lowest Loss: 0.25335875153541565
+
+24: 17:
+Highest Accuracy Epoch: 94 Lowest Loss Epoch: 100
+Highest Accuracy: 0.9259109497070312 Lowest Loss: 0.2593708038330078

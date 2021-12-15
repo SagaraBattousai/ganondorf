@@ -2,4 +2,6 @@ Image_Name,Brusing_Percentage
 image_01.png,12.071428571428571
 image_02.png,14.548126377663484
 image_03.png,3.0026109660574414
-average,10
+mean,9.87
+median, 12.07
+range, 11.55

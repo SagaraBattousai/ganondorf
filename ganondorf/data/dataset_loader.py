@@ -41,36 +41,50 @@ def dir_to_mask(path):
     img = fid.as_mask(img)
     img.save(x)
 
-def load_image_single_dataset(path:str, 
-                              dirname:str="image",
-                              size:tuple[int, int]=None)->tf.data.Dataset:
+def load_image_single(path:str, 
+                      dirname:str="image",
+                      size:tuple[int, int]=None)->list[np.array]:
 
   dataset_path = resources.files(gdds).joinpath(path)
 
-  image_files = dataset_path.joinpath(dirname).iterdir()
+  if dirname is not None:
+    image_files = dataset_path.joinpath(dirname).iterdir()
+  else:
+    image_files = dataset_path.iterdir()
 
   images = []
 
   for img in image_files:
 
     if size is not None:
-      image = fid.image_as_array(fid.resize_image(img, size))
+      try:
+        image = fid.image_as_array(fid.resize_image(img, size))
+      except ValueError:
+        continue
     else:
       image = image_as_array(img) # Using path but in zip so not safe? 
 
     images.append(image)
   
+  return images
+
+def load_image_single_dataset(path:str, 
+                              dirname:str="image",
+                              size:tuple[int, int]=None)->tf.data.Dataset:
+  
+  images = load_image_single(path, dirname, size)
   return tf.data.Dataset.from_tensor_slices(images)
 
 def load_image_pair_dataset(path:str, 
-                            image_dirname:str="image",
-                            label_dirname:str="mask",
-                            size:tuple[int, int]=None)->tf.data.Dataset:
+                            fst_dirname:str="image",
+                            snd_dirname:str="mask",
+                            size:tuple[int, int]=None,
+                            snd_mode:str=None)->tf.data.Dataset:
 
   dataset_path = resources.files(gdds).joinpath(path)
 
-  image_files = dataset_path.joinpath(image_dirname).iterdir()
-  label_files = dataset_path.joinpath(label_dirname).iterdir()
+  image_files = dataset_path.joinpath(fst_dirname).iterdir()
+  label_files = dataset_path.joinpath(snd_dirname).iterdir()
 
   images = []
   labels = []
@@ -78,8 +92,11 @@ def load_image_pair_dataset(path:str,
   for img, lab in zip(image_files, label_files):
 
     if size is not None:
-      image = fid.image_as_array(fid.resize_image(img, size))
-      label = fid.image_as_array(fid.resize_image(lab, size), mode='1')
+      try:
+        image = fid.image_as_array(fid.resize_image(img, size))
+        label = fid.image_as_array(fid.resize_image(lab, size), mode=snd_mode)
+      except ValueError:
+        continue
     else:
       #TODO: decide if acceptable or not!
       image = image_as_array(img) # Using path but in zip so not safe? 
@@ -140,14 +157,16 @@ def load_segmentation_dataset(path:str,
 
   if load_train:
     dataset.append(load_image_pair_dataset(path + "/train",
-                                           image_dirname="image",
-                                           label_dirname="mask",
-                                           size=size))
+                                           fst_dirname="image",
+                                           snd_dirname="mask",
+                                           size=size,
+                                           snd_mode="1"))
   if load_test:
     dataset.append(load_image_pair_dataset(path + "/test",
-                                           image_dirname="image",
-                                           label_dirname="mask",
-                                           size=size))
+                                           fst_dirname="image",
+                                           snd_dirname="mask",
+                                           size=size,
+                                           snd_mode="1"))
   if dataset == []:
     return None
   elif len(dataset) == 1:
@@ -176,6 +195,34 @@ def load_generation_dataset(path:str,
   else:
     return tuple(dataset)
 
+def load_cycle_model(domain_a_path:str, 
+                     domain_b_path:str, 
+                     load_train:bool=True,
+                     load_test:bool=True,
+                     size:tuple[int, int]=None)->dict[tf.data.Dataset]:
+
+  dataset = {}
+
+  #Should clean this all up into pair load but tbf i just dont have the time!
+  if load_train:
+    dataset["trainA"] = load_image_single_dataset(domain_a_path,
+                                                  dirname="train",
+                                                  size=size)
+
+    dataset["trainB"] = load_image_single_dataset(domain_b_path,
+                                                  dirname="train",
+                                                  size=size)
+  if load_test:
+    dataset["testA"] = load_image_single_dataset(domain_a_path,
+                                                 dirname="test",
+                                                 size=size)
+
+    dataset["testB"] = load_image_single_dataset(domain_b_path,
+                                                 dirname="test",
+                                                 size=size)
+ 
+  return dataset
+
 def load_AL_segmentation(load_train = True,
                          load_test = True,
                          size:tuple[int, int]=None)->tf.data.Dataset:
@@ -187,6 +234,12 @@ def load_AL_ring(load_train = True,
                  load_test = True,
                  size:tuple[int, int]=None)->tf.data.Dataset:
   path = "ALRing"
+  return load_segmentation_dataset(path, load_train, load_test, size)
+
+def load_AL_ring_345(load_train = True,
+                     load_test = True,
+                     size:tuple[int, int]=None)->tf.data.Dataset:
+  path = "ALRingWithDays345"
   return load_segmentation_dataset(path, load_train, load_test, size)
 
 def load_AL_generation(load_train = True,
