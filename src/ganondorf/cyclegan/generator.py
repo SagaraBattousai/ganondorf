@@ -70,8 +70,9 @@ def Generator(): # pylint: disable=C0103
 
   return tf.keras.Model(inputs=inputs, outputs=x)
 
-def generator_loss(generated):
-  return loss_obj(tf.ones_like(generated), generated)
+@tf.function
+def generator_loss(disc_of_generated):
+  return loss_obj(tf.ones_like(disc_of_generated), disc_of_generated)
 
 
 def generator_loss_med(target, gen_output, disc_gen_output):

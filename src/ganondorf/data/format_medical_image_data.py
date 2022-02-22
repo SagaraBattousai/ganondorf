@@ -6,45 +6,16 @@ import numpy as np
 import os
 from typing import Sequence
 import tensorflow as tf
-from ganondorf.core import datacore
+import ganon.data
+#VV This way it apears as if that function origionated here, needed untill all
+# data code is transformed 
+from ganon.data import window_level
 
 __all__ = ['window_level', 'medical_as_array', 'split_into_patches',
            'sew_patches', 'resize_nii', 'convert_dir_images_to_nii',
            'resize_medical_image', 'square_medical_pad',
            'square_medical_pad_and_save', 'save_image_array',
            'load_image_array']
-
-def window_level(hound_image: np.array, window: int, level:int) -> np.array:
-
-  image = hound_image.copy()  # ?????????
-
-  if image.ndim == 3:
-    half_window = window // 2
-    window_min = level - half_window
-    window_max = level + half_window
-
-
-    image[image < window_min] = window_min
-    image[image > window_max] = window_max
-
-    image = image - window_min
-
-    batch_count = image.shape[0]
-
-    max_vector = \
-        np.amax(np.amax(image, axis=1), axis=1) \
-        .reshape(batch_count, -1, 1)
-
-    max_matrix = np.full_like(image, max_vector)
-
-    max_matrix[max_matrix == 0] = -1
-
-    image = image * (255 / max_matrix)
-
-  else:
-    image = datacore.window_level(image, window, level)
-
-  return image
 
 def medical_as_array(image: sitk.Image) -> np.array:
   return sitk.GetArrayFromImage(image).astype(np.float32)[..., np.newaxis]

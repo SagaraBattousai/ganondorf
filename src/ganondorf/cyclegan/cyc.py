@@ -64,6 +64,7 @@ LAMBDA = 10
 #         self.model.save("./ring_segmentation_checkpoint/best_accuracy")
 #         self.best_accuracy = logs['val_accuracy']
 
+@tf.function
 def random_crop(image, size=(128,128)):
   cropped_image = tf.image.random_crop(
       image, size=[size[0], size[0], 3])
@@ -71,11 +72,13 @@ def random_crop(image, size=(128,128)):
   return cropped_image
 
 # normalizing the images to [-1, 1]
+@tf.function
 def normalize(image):
   image = tf.cast(image, tf.float32)
   image = (image / 127.5) - 1 # vs /255.0
   return image
 
+@tf.function
 def random_jitter(image):
   # resizing to 143 x 143 x 3 for 128x128 img
   image = tf.image.resize(image, [143, 143],
@@ -89,19 +92,23 @@ def random_jitter(image):
 
   return image
 
+@tf.function
 def preprocess_image_train(image):
   image = random_jitter(image)
   image = normalize(image)
   return image
 
+@tf.function
 def preprocess_image_test(image):
   image = normalize(image)
   return image
 
+@tf.function
 def calc_cycle_loss(real_image, cycled_image):
   loss1 = tf.reduce_mean(tf.abs(real_image - cycled_image))
   return LAMBDA * loss1
 
+@tf.function
 def identity_loss(real_image, same_image):
   loss = tf.reduce_mean(tf.abs(real_image - same_image))
   return LAMBDA * 0.5 * loss
@@ -119,7 +126,7 @@ def generate_images(model, test_input):
     plt.axis('off')
   plt.show()
 
-def generate_cycle(model_da, test_da, model_db, test_db):
+def generate_cycle(model_da, test_da, model_db, test_db): 
   prediction_db = model_da(test_da)
   prediction_da = model_db(test_db)
 
@@ -209,13 +216,19 @@ if __name__ == '__main__':
   train_colon, train_model = dataset["trainA"], dataset["trainB"]
   test_colon, test_model = dataset["testA"], dataset["testB"]
 
-  train_colon = train_colon.cache().map(
-      preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-          BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
+  train_colon = train_colon.cache().map(preprocess_image_train,
+                                        num_parallel_calls=AUTOTUNE)
 
-  train_model = train_model.cache().map(
-      preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-          BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
+  train_model = train_model.cache().map(preprocess_image_train,
+                                        num_parallel_calls=AUTOTUNE)
+
+  sc = tf.expand_dims(next(iter(train_colon)), axis=0)
+  sm = tf.expand_dims(next(iter(train_model)), axis=0)
+
+  train_colon = train_colon.shuffle(BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
+
+  train_model = train_model.shuffle(BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
+  
 
   #------------------------------------------------------------------
 
@@ -227,31 +240,12 @@ if __name__ == '__main__':
       preprocess_image_train, num_parallel_calls=AUTOTUNE).cache().shuffle(
           BUFFER_SIZE).batch(BATCH_SIZE)#.repeat()
 
-  sc = next(iter(train_colon))
-  sm = next(iter(train_model))
-  
 
   generator_da = transfer_generator() #Generator()
   generator_db = transfer_generator() #Generator()
 
   discriminator_da = Discriminator()
   discriminator_db = Discriminator()
-
-  # tf.keras.utils.plot_model(d, show_shapes=True, dpi=64)
-
-  # contrast = 8
-
-  # to_model = generator_da(sc)
-
-  # plt.subplot(121)
-  # plt.title('Colon')
-  # plt.imshow(sc[0] * 0.5 + 0.5)
-
-  # plt.subplot(122)
-  # plt.title('Gen')
-  # plt.imshow(to_model[0] * 0.5 * contrast + 0.5)
-
-  # plt.show()
 
 
   generator_da_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -353,23 +347,29 @@ if __name__ == '__main__':
         zip(discriminator_db_gradients,
             discriminator_db.trainable_variables))
 
-  for epoch in range(EPOCHS):
-    start = time.time()
 
-    n = 0
-    for image_da, image_db in tf.data.Dataset.zip((train_colon, train_model)):
-      train_step(image_da, image_db)
-      if n % 10 == 0:
-        print(".", end="")
-      n += 1
+  def run():
+    for epoch in range(EPOCHS):
+      start = time.time()
 
-    if (epoch + 1) % 10 == 0:
-      generate_cycle(generator_da, sc, generator_db, sm)
+      n = 0
+      for image_da, image_db in tf.data.Dataset.zip((train_colon, train_model)):
+        train_step(image_da, image_db)
+        if n % 10 == 0:
+          print(".", end="")
+        n += 1
 
-    if (epoch + 1) % 5 == 0:
-      ckpt_save_path = ckpt_manager.save()
-      print("Saving checkpoint for epoch {} at {}".format(epoch + 1,
-                                                          ckpt_save_path))
+      if (epoch + 1) % 10 == 0:
+        generate_cycle(generator_da, sc, generator_db, sm)
 
-    print("Time taken for epoch {} is {} sec\n".format(epoch + 1,
-                                                       time.time() - start))
+      if (epoch + 1) % 5 == 0:
+        ckpt_save_path = ckpt_manager.save()
+        print("Saving checkpoint for epoch {} at {}".format(epoch + 1,
+                                                            ckpt_save_path))
+
+      print("Time taken for epoch {} is {} sec\n".format(epoch + 1,
+                                                         time.time() - start))
+  run()
+
+
+  

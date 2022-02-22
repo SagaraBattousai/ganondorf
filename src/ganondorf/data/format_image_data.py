@@ -8,8 +8,8 @@ import PIL
 import numpy as np
 import os
 import tensorflow as tf
-from ganondorf.core import datacore
-import pythonal
+# import ganon.data
+# import pythonal
 
 __all__ = ['image_as_array', 'as_mask', 'resize_image',
            'normalize', 'square_images', 'resize_images',

@@ -1,0 +1,207 @@
+* Creating virtualenv isolated environment...
+* Installing packages in isolated environment... (cemake, setuptools >= 57.0.0, wheel)
+* Getting dependencies for sdist...
+* Installing packages in isolated environment... (cemake)
+* Building sdist...
+running sdist
+running egg_info
+writing ganondorf.egg-info\PKG-INFO
+writing dependency_links to ganondorf.egg-info\dependency_links.txt
+writing requirements to ganondorf.egg-info\requires.txt
+writing top-level names to ganondorf.egg-info\top_level.txt
+reading manifest file 'ganondorf.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+running check
+copying files to ganondorf-0.0.5...
+Writing ganondorf-0.0.5\setup.cfg
+* Building wheel from sdist
+* Creating virtualenv isolated environment...
+* Installing packages in isolated environment... (cemake, setuptools >= 57.0.0, wheel)
+* Getting dependencies for wheel...
+* Installing packages in isolated environment... (cemake, wheel)
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+running egg_info
+writing ganondorf.egg-info\PKG-INFO
+writing dependency_links to ganondorf.egg-info\dependency_links.txt
+writing requirements to ganondorf.egg-info\requires.txt
+writing top-level names to ganondorf.egg-info\top_level.txt
+reading manifest file 'ganondorf.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+running build_ext
+-- Building for: Visual Studio 16 2019
+-- Selecting Windows SDK version 10.0.19041.0 to target Windows 10.0.22000.
+-- The C compiler identification is MSVC 19.29.30139.0
+-- The CXX compiler identification is MSVC 19.29.30139.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python3: optimized;C:/Python/libs/python39.lib;debug;C:/Python/libs/python39_d.lib (found version "3.9.5") found components: Development NumPy Interpreter Development.Module Development.Embed 
+-- 1.22.2
+-- Setting library extension to .cp39-win_amd64.pyd
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/james/AppData/Local/Temp/build-via-sdist-aig3xpq7/ganondorf-0.0.5/build/temp.win-amd64-3.9/Release
+Microsoft (R) Build Engine version 16.11.2+f32259642 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(517,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it could lead to issues with incremental build. [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ZERO_CHECK.vcxproj]
+  Checking Build System
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(517,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it could lead to issues with incremental build. [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+  Building Custom Rule C:/Users/james/AppData/Local/Temp/build-via-sdist-aig3xpq7/ganondorf-0.0.5/ganondorf/core/src/data/CMakeLists.txt
+  datacore.c
+C:\Python\Lib\site-packages\numpy\core\include\numpy\npy_1_7_deprecated_api.h(14): warning Msg: Using deprecated NumPy API, disable it with #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\datacore.c(42,94): warning C4133: '=': incompatible types - from 'PyObject *' to 'PyArrayObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\datacore.c(43,18): warning C4133: 'function': incompatible types - from 'PyArrayObject *' to 'PyObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\datacore.c(50,18): warning C4133: 'function': incompatible types - from 'PyArrayObject *' to 'PyObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\datacore.c(52,15): warning C4133: 'return': incompatible types - from 'PyArrayObject *' to 'PyObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+  arrayfunctions.c
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,11): error C2061: syntax error: identifier 'PyArray_CalculateMoments' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,11): error C2059: syntax error: ';' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,50): error C2143: syntax error: missing ')' before '*' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,50): error C2143: syntax error: missing '{' before '*' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,54): error C2059: syntax error: ')' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Python\Lib\site-packages\numpy\core\include\numpy\npy_1_7_deprecated_api.h(14): warning Msg: Using deprecated NumPy API, disable it with #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(30,27): warning C4133: 'function': incompatible types - from 'PyObject *' to 'PyArrayObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(22,1): warning C4133: 'initializing': incompatible types - from 'PyObject *' to 'PyArrayObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(46,25): warning C4133: 'function': incompatible types - from 'PyObject *' to 'PyArrayObject *' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(52,14): warning C4047: 'return': 'PyObject *' differs in levels of indirection from 'int' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(62,14): warning C4047: 'return': 'PyObject *' differs in levels of indirection from 'int' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\arrayfunctions.c(96,10): error C2059: syntax error: '<parameter-list>' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+  datasettype.c
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,11): error C2061: syntax error: identifier 'PyArray_CalculateMoments' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,11): error C2059: syntax error: ';' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,50): error C2143: syntax error: missing ')' before '*' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,50): error C2143: syntax error: missing '{' before '*' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\ganondorf\core\src\data\..\..\include\ganondorf\arrayfunctions.h(17,54): error C2059: syntax error: ')' [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+C:\Python\Lib\site-packages\numpy\core\include\numpy\npy_1_7_deprecated_api.h(14): warning Msg: Using deprecated NumPy API, disable it with #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION [C:\Users\james\AppData\Local\Temp\build-via-sdist-aig3xpq7\ganondorf-0.0.5\build\temp.win-amd64-3.9\Release\ganondorf\core\src\data\datacore.vcxproj]
+  Generating Code...
+installing to build\bdist.win-amd64\wheel
+running install
+running install_lib
+copying build\lib.win-amd64-3.9\ganondorf\core\CMakeLists.txt -> build\bdist.win-amd64\wheel\.\ganondorf\core
+copying build\lib.win-amd64-3.9\ganondorf\core\include\ganondorf\arrayfunctions.h -> build\bdist.win-amd64\wheel\.\ganondorf\core\include\ganondorf
+copying build\lib.win-amd64-3.9\ganondorf\core\include\ganondorf\datacore.h -> build\bdist.win-amd64\wheel\.\ganondorf\core\include\ganondorf
+copying build\lib.win-amd64-3.9\ganondorf\core\include\ganondorf\datasettype.h -> build\bdist.win-amd64\wheel\.\ganondorf\core\include\ganondorf
+copying build\lib.win-amd64-3.9\ganondorf\core\src\data\arrayfunctions.c -> build\bdist.win-amd64\wheel\.\ganondorf\core\src\data
+copying build\lib.win-amd64-3.9\ganondorf\core\src\data\CMakeLists.txt -> build\bdist.win-amd64\wheel\.\ganondorf\core\src\data
+copying build\lib.win-amd64-3.9\ganondorf\core\src\data\datacore.c -> build\bdist.win-amd64\wheel\.\ganondorf\core\src\data
+copying build\lib.win-amd64-3.9\ganondorf\core\src\data\datasettype.c -> build\bdist.win-amd64\wheel\.\ganondorf\core\src\data
+copying build\lib.win-amd64-3.9\ganondorf\cyclegan\cyc.py -> build\bdist.win-amd64\wheel\.\ganondorf\cyclegan
+copying build\lib.win-amd64-3.9\ganondorf\cyclegan\discriminator.py -> build\bdist.win-amd64\wheel\.\ganondorf\cyclegan
+copying build\lib.win-amd64-3.9\ganondorf\cyclegan\generator.py -> build\bdist.win-amd64\wheel\.\ganondorf\cyclegan
+copying build\lib.win-amd64-3.9\ganondorf\cyclegan\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\cyclegan
+copying build\lib.win-amd64-3.9\ganondorf\data\dataset.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\datasets\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\data\datasets
+copying build\lib.win-amd64-3.9\ganondorf\data\dataset_loader.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\format_image_data.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\format_medical_image_data.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\format_raw_data.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\image_dataset.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\text_dataset.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\visualizer.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\data\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\data
+copying build\lib.win-amd64-3.9\ganondorf\ganon\generate_al.py -> build\bdist.win-amd64\wheel\.\ganondorf\ganon
+copying build\lib.win-amd64-3.9\ganondorf\ganon\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\ganon
+copying build\lib.win-amd64-3.9\ganondorf\layers\blocks.py -> build\bdist.win-amd64\wheel\.\ganondorf\layers
+copying build\lib.win-amd64-3.9\ganondorf\layers\residual.py -> build\bdist.win-amd64\wheel\.\ganondorf\layers
+copying build\lib.win-amd64-3.9\ganondorf\layers\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\layers
+copying build\lib.win-amd64-3.9\ganondorf\math\image_math.py -> build\bdist.win-amd64\wheel\.\ganondorf\math
+copying build\lib.win-amd64-3.9\ganondorf\math\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\math
+copying build\lib.win-amd64-3.9\ganondorf\models\generator.py -> build\bdist.win-amd64\wheel\.\ganondorf\models
+copying build\lib.win-amd64-3.9\ganondorf\models\typing.py -> build\bdist.win-amd64\wheel\.\ganondorf\models
+copying build\lib.win-amd64-3.9\ganondorf\models\unet.py -> build\bdist.win-amd64\wheel\.\ganondorf\models
+copying build\lib.win-amd64-3.9\ganondorf\models\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\models
+copying build\lib.win-amd64-3.9\ganondorf\pix2pix\discriminator.py -> build\bdist.win-amd64\wheel\.\ganondorf\pix2pix
+copying build\lib.win-amd64-3.9\ganondorf\pix2pix\generator.py -> build\bdist.win-amd64\wheel\.\ganondorf\pix2pix
+copying build\lib.win-amd64-3.9\ganondorf\pix2pix\run.py -> build\bdist.win-amd64\wheel\.\ganondorf\pix2pix
+copying build\lib.win-amd64-3.9\ganondorf\pix2pix\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\pix2pix
+copying build\lib.win-amd64-3.9\ganondorf\random\normal.py -> build\bdist.win-amd64\wheel\.\ganondorf\random
+copying build\lib.win-amd64-3.9\ganondorf\random\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\random
+copying build\lib.win-amd64-3.9\ganondorf\segmentation\mask_image.py -> build\bdist.win-amd64\wheel\.\ganondorf\segmentation
+copying build\lib.win-amd64-3.9\ganondorf\segmentation\segment.py -> build\bdist.win-amd64\wheel\.\ganondorf\segmentation
+copying build\lib.win-amd64-3.9\ganondorf\segmentation\segment_345.py -> build\bdist.win-amd64\wheel\.\ganondorf\segmentation
+copying build\lib.win-amd64-3.9\ganondorf\segmentation\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\segmentation
+copying build\lib.win-amd64-3.9\ganondorf\segmentation\__main__.py -> build\bdist.win-amd64\wheel\.\ganondorf\segmentation
+copying build\lib.win-amd64-3.9\ganondorf\transfer\segment_transfer.py -> build\bdist.win-amd64\wheel\.\ganondorf\transfer
+copying build\lib.win-amd64-3.9\ganondorf\transfer\transfer.py -> build\bdist.win-amd64\wheel\.\ganondorf\transfer
+copying build\lib.win-amd64-3.9\ganondorf\transfer\transfer_classif_old.py -> build\bdist.win-amd64\wheel\.\ganondorf\transfer
+copying build\lib.win-amd64-3.9\ganondorf\transfer\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf\transfer
+copying build\lib.win-amd64-3.9\ganondorf\transfer\__main__.py -> build\bdist.win-amd64\wheel\.\ganondorf\transfer
+copying build\lib.win-amd64-3.9\ganondorf\__init__.py -> build\bdist.win-amd64\wheel\.\ganondorf
+copying build\lib.win-amd64-3.9\ganondorf\__main__.py -> build\bdist.win-amd64\wheel\.\ganondorf
+running install_egg_info
+running install_scripts
+adding license file "LICENSE" (matched pattern "LICEN[CS]E*")
+creating build\bdist.win-amd64\wheel\ganondorf-0.0.5.dist-info\WHEEL
+creating 'C:\Users\james\ganondorf\dist\tmpw8nf4bkd\ganondorf-0.0.5-cp39-cp39-win_amd64.whl' and adding 'build\bdist.win-amd64\wheel' to it
+adding 'ganondorf/__init__.py'
+adding 'ganondorf/__main__.py'
+adding 'ganondorf/core/CMakeLists.txt'
+adding 'ganondorf/core/include/ganondorf/arrayfunctions.h'
+adding 'ganondorf/core/include/ganondorf/datacore.h'
+adding 'ganondorf/core/include/ganondorf/datasettype.h'
+adding 'ganondorf/core/src/data/CMakeLists.txt'
+adding 'ganondorf/core/src/data/arrayfunctions.c'
+adding 'ganondorf/core/src/data/datacore.c'
+adding 'ganondorf/core/src/data/datasettype.c'
+adding 'ganondorf/cyclegan/__init__.py'
+adding 'ganondorf/cyclegan/cyc.py'
+adding 'ganondorf/cyclegan/discriminator.py'
+adding 'ganondorf/cyclegan/generator.py'
+adding 'ganondorf/data/__init__.py'
+adding 'ganondorf/data/dataset.py'
+adding 'ganondorf/data/dataset_loader.py'
+adding 'ganondorf/data/format_image_data.py'
+adding 'ganondorf/data/format_medical_image_data.py'
+adding 'ganondorf/data/format_raw_data.py'
+adding 'ganondorf/data/image_dataset.py'
+adding 'ganondorf/data/text_dataset.py'
+adding 'ganondorf/data/visualizer.py'
+adding 'ganondorf/data/datasets/__init__.py'
+adding 'ganondorf/ganon/__init__.py'
+adding 'ganondorf/ganon/generate_al.py'
+adding 'ganondorf/layers/__init__.py'
+adding 'ganondorf/layers/blocks.py'
+adding 'ganondorf/layers/residual.py'
+adding 'ganondorf/math/__init__.py'
+adding 'ganondorf/math/image_math.py'
+adding 'ganondorf/models/__init__.py'
+adding 'ganondorf/models/generator.py'
+adding 'ganondorf/models/typing.py'
+adding 'ganondorf/models/unet.py'
+adding 'ganondorf/pix2pix/__init__.py'
+adding 'ganondorf/pix2pix/discriminator.py'
+adding 'ganondorf/pix2pix/generator.py'
+adding 'ganondorf/pix2pix/run.py'
+adding 'ganondorf/random/__init__.py'
+adding 'ganondorf/random/normal.py'
+adding 'ganondorf/segmentation/__init__.py'
+adding 'ganondorf/segmentation/__main__.py'
+adding 'ganondorf/segmentation/mask_image.py'
+adding 'ganondorf/segmentation/segment.py'
+adding 'ganondorf/segmentation/segment_345.py'
+adding 'ganondorf/transfer/__init__.py'
+adding 'ganondorf/transfer/__main__.py'
+adding 'ganondorf/transfer/segment_transfer.py'
+adding 'ganondorf/transfer/transfer.py'
+adding 'ganondorf/transfer/transfer_classif_old.py'
+adding 'ganondorf-0.0.5.dist-info/LICENSE'
+adding 'ganondorf-0.0.5.dist-info/METADATA'
+adding 'ganondorf-0.0.5.dist-info/WHEEL'
+adding 'ganondorf-0.0.5.dist-info/top_level.txt'
+adding 'ganondorf-0.0.5.dist-info/zip-safe'
+adding 'ganondorf-0.0.5.dist-info/RECORD'
+removing build\bdist.win-amd64\wheel
+Successfully built ganondorf-0.0.5.tar.gz and ganondorf-0.0.5-cp39-cp39-win_amd64.whl

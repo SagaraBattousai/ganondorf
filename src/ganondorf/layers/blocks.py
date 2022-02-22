@@ -16,6 +16,7 @@ Feature3D = functools.partial(tf.keras.layers.Conv3D,
                               kernel_size=(3,3,3),
                               padding="same",
                               #use_bias=False
+                              use_bias=False
                               )
 
 Decode3D = functools.partial(tf.keras.layers.Conv3DTranspose,
@@ -28,6 +29,7 @@ Feature2D = functools.partial(tf.keras.layers.Conv2D,
                               kernel_size=(3,3),
                               padding="same",
                               #use_bias=False
+                              use_bias=False
                               )
 
 Decode2D = functools.partial(tf.keras.layers.Conv2DTranspose,

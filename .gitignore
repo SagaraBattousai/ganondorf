@@ -16,27 +16,24 @@ variables.index
 # No Secret Tokens
 .*_token
 
+# profile files
+profileStats
 # Project specific
-ganondorf/tensorflow_outputs
-ganondorf/Generator_Output/
-ganondorf/training_checkpoints/
-ganondorf/data/datasets/*
-!ganondorf/data/datasets/__init__.py
-# Ignore inplace C-Extension builds but reinclude source
-#ganondorf/core/*
-#!ganondorf/core/CMakeLists.txt
-#!ganondorf/core/include/
-#!ganondorf/core/src/
+src/ganondorf/tensorflow_outputs
+src/ganondorf/Generator_Output/
+src/ganondorf/training_checkpoints/
+src/ganondorf/data/datasets/*
+src/!ganondorf/data/datasets/__init__.py
 
 # Network Checkpoints
-ganondorf/networks/*
-ganondorf/segmentation/ring_segmentation_checkpoint/
-ganondorf/transfer/E12_chkpt/
-ganondorf/transfer/E250_chkpt/
-ganondorf/transfer/E78_chkpt/
-ganondorf/transfer/E78_chkpt_Without_image_09/
-ganondorf/transfer/fine_chkpt/
-ganondorf/segmentation/ring_intraoperative_segmentation_checkpoint/
+src/ganondorf/networks/*
+src/ganondorf/segmentation/ring_segmentation_checkpoint/
+src/ganondorf/transfer/E12_chkpt/
+src/ganondorf/transfer/E250_chkpt/
+src/ganondorf/transfer/E78_chkpt/
+src/ganondorf/transfer/E78_chkpt_Without_image_09/
+src/ganondorf/transfer/fine_chkpt/
+src/ganondorf/segmentation/ring_intraoperative_segmentation_checkpoint/
 
 
 # Vim Files

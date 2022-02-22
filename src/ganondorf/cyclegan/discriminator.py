@@ -61,8 +61,20 @@ def Discriminator(): #pylint: disable=C0103
   return tf.keras.Model(inputs=inp, outputs=x)
 
 
-
+@tf.function
 def discriminator_loss(real, generated):
+  labels = tf.concat(
+      (tf.ones_like(real), tf.zeros_like(generated)), axis=0
+  )
+
+  labels += 0.05 * tf.random.uniform(labels.shape)
+
+  data = tf.concat((real, generated), axis=0)
+
+  return loss_obj(labels, data)
+
+
+def discriminator_loss_orig(real, generated):
   real_loss = loss_obj(tf.ones_like(real), real)
   generated_loss = loss_obj(tf.zeros_like(generated), generated)
 

@@ -17,7 +17,7 @@ import PIL
 import numpy as np
 import tensorflow as tf
 import SimpleITK as sitk
-import ptils
+#import ptils
 
 #intra-package imports
 import ganondorf.data.format_image_data as fid
@@ -122,8 +122,8 @@ def load_medical_dataset(path:str,
 
   for patient in patients:
     patient_data = [data for data in patient.iterdir() \
-                    if data.startswith(data_prefix) and \
-                       data.endswith(data_suffix) ]
+                    if str(data).startswith(data_prefix) and \
+                       str(data).endswith(data_suffix) ]
     dataset.extend(patient_data)
 
   return tf.data.Dataset.from_tensor_slices(dataset)
